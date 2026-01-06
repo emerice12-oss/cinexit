@@ -14,11 +14,14 @@ const EPOCH_ABI = [
     outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    name: 'epochFinalized',
+    name: 'epochs',
     type: 'function',
     stateMutability: 'view',
     inputs: [{ name: 'epoch', type: 'uint256' }],
-    outputs: [{ name: '', type: 'bool' }],
+    outputs: [
+      { name: 'rewards', type: 'uint256' },
+      { name: 'finalized', type: 'bool' },
+    ],
   },
   {
     name: 'epochRevenue',
@@ -38,12 +41,18 @@ export function useCurrentEpoch() {
 }
 
 export function useEpochFinalized(epoch?: bigint) {
-  return useReadContract({
+  const r = useReadContract({
     address: EPOCH_MANAGER,
     abi: EPOCH_ABI,
-    functionName: 'epochFinalized',
+    functionName: 'epochs',
     args: epoch !== undefined ? [epoch] : undefined,
   });
+
+  return {
+    data: r.data ? (r.data as any)[1] : undefined,
+    error: r.error,
+    isLoading: r.isLoading,
+  } as const;
 }
 
 export function useEpochRevenue(epoch?: bigint) {

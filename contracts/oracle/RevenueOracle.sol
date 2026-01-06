@@ -135,4 +135,12 @@ contract RevenueOracle {
         signerCount--;
         emit SignerRemoved(s);
     }
+
+    function signerCount() external view returns (uint256) {
+        return signers.length;
+    }
+
+    function lastEpoch() external view returns (uint256) {
+        return latestEpoch;
+    }
 }

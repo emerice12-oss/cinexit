@@ -187,22 +187,27 @@ const { data: revenue } = useEpochRevenue(lastEpoch);
 
             <button
               className="bg-purple-600 text-white px-4 py-2 rounded w-full"
-                disabled={protocolBlocked || !rewards || rewards === 0n}
-              onClick={() =>
-                claim({
+              disabled={
+                protocolBlocked || !rewards || rewards === 0n || batchEpochs.trim() === ''
+              }
+              onClick={() => {
+                const epochs = parseEpochs(batchEpochs);
+                if (epochs.length === 0) return;
+                claimBatch({
                   address: REWARD_DISTRIBUTOR,
                   abi: [
                     {
-                      name: 'claim',
+                      name: 'claimBatch',
                       type: 'function',
                       stateMutability: 'nonpayable',
-                      inputs: [],
+                      inputs: [{ name: 'epochs', type: 'uint256[]' }],
                       outputs: [],
                     },
                   ],
-                  functionName: 'claim',
-                })
-              }
+                  functionName: 'claimBatch',
+                  args: [epochs],
+                });
+              }}
             >
               Claim Rewards
             </button>
