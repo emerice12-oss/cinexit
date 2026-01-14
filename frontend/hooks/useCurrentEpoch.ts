@@ -6,7 +6,7 @@ import { CONTRACTS } from '@/lib/contracts'
 
 export function useCurrentEpoch() {
   const { data } = useReadContract({
-    address: CONTRACTS.EPOCH_MANAGER,
+    address: CONTRACTS.EPOCH_MANAGER as `0x${string}`,
     abi: EPOCH_MANAGER_ABI,
     functionName: 'currentEpoch',
     query: {
@@ -14,5 +14,5 @@ export function useCurrentEpoch() {
     },
   })
 
-  return Number(data ?? 0)
-}
+  return { epoch: (data as bigint) ?? 0n }
+} 

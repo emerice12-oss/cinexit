@@ -39,26 +39,26 @@ export default function DepositCard() {
   }
 
   return (
-    <div className="p-4 bg-white rounded shadow space-y-3">
-      <h3 className="font-semibold">Deposit USDC</h3>
-
-      <button
-        disabled={tx.isBusy}
-        onClick={() => deposit('100')}
-        className="px-4 py-2 bg-black text-white rounded disabled:opacity-50"
-      >
-        {tx.state === 'signing' && 'Confirm in wallet'}
-        {tx.state === 'pending' && 'Depositing...'}
-        {tx.state === 'success' && 'Deposited ✓'}
-        {tx.state === 'idle' && 'Deposit 100 USDC'}
-        {tx.state === 'error' && 'Retry'}
-      </button>
-
-      {tx.error && <p className="text-red-600 text-sm">{tx.error}</p>}
-    
-      <RequireWalletAndNetwork>
+    <RequireWalletAndNetwork>
         <DepositCard />
-      </RequireWalletAndNetwork>
-    </div>
+          <div className="p-4 bg-white rounded shadow space-y-3">
+            <h3 className="font-semibold">Deposit USDC</h3>
+
+            <button
+               disabled={tx.isBusy}
+               onClick={() => deposit('100')}
+               className="px-4 py-2 bg-black text-white rounded disabled:opacity-50"
+            >
+               {tx.state === 'signing' && 'Confirm in wallet'}
+               {tx.state === 'pending' && 'Depositing...'}
+               {tx.state === 'success' && 'Deposited ✓'}
+               {tx.state === 'idle' && 'Deposit 100 USDC'}
+               {tx.state === 'error' && 'Retry'}
+            </button>
+
+            {tx.error && <p className="text-red-600 text-sm">{tx.error}</p>}
+    
+          </div>
+    </RequireWalletAndNetwork>
   )
 }

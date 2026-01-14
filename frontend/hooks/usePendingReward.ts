@@ -12,7 +12,7 @@ export function usePendingReward() {
     address: CONTRACTS.DISTRIBUTOR,
     abi: distributorAbi,
     functionName: 'pendingReward',
-    args: address ? [address] : undefined,
+    args: address ? [address as `0x${string}`] : undefined,
     query: {
       enabled: !!address,
       refetchInterval: 4_000,
@@ -20,7 +20,7 @@ export function usePendingReward() {
   })
 
   return {
-    pending: data ? Number(formatUnits(data, 6)) : 0,
+    pending: (data as bigint) ?? 0n,
     isLoading,
   }
-}
+} 

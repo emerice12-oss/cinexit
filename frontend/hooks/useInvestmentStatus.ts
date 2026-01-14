@@ -14,14 +14,14 @@ export function useInvestmentStatus() {
     address: CONTRACTS.VAULT,
     abi: VAULT_ABI,
     functionName: 'balanceOf',
-    args: address ? [address] : undefined,
+    args: address ? [address as `0x${string}`] : undefined,
   })
 
   const { data: pending } = useReadContract({
     address: CONTRACTS.DISTRIBUTOR,
     abi: distributorAbi,
     functionName: 'pendingReward',
-    args: address ? [address] : undefined,
+    args: address ? [address as `0x${string}`] : undefined,
   })
 
   const { data: paused } = useReadContract({
@@ -30,8 +30,8 @@ export function useInvestmentStatus() {
     functionName: 'paused',
   })
 
-  const depositAmount = deposited ? Number(formatUnits(deposited, 6)) : 0
-  const pendingReward = pending ? Number(formatUnits(pending, 6)) : 0
+  const depositAmount = deposited ? Number(formatUnits(deposited as bigint, 6)) : 0
+  const pendingReward = pending ? Number(formatUnits(pending as bigint, 6)) : 0
 
   return {
     isActive: depositAmount > 0 && !paused,
