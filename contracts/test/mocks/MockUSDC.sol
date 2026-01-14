@@ -14,8 +14,18 @@ contract MockUSDC {
     // assume all minted tokens are held by the small set of tracked accounts.
     uint256 public totalSupply;
 
+    // Cap total supply to avoid pathological fuzz inputs that can overflow
+    // test-side accumulators. This cap is intentionally very large and
+    // will not affect realistic test scenarios.
+    uint256 public constant MAX_TOTAL_SUPPLY = 10 ** 30;
+
     /// @notice Mint tokens for testing. Increases `totalSupply` and can mint to arbitrary addresses (used by fuzzing).
     function mint(address to, uint256 amount) external {
+        // Prevent overflow on minting huge amounts during fuzzing
+        require(balanceOf[to] + amount >= balanceOf[to], "Mint overflow");
+        require(totalSupply + amount >= totalSupply, "TotalSupply overflow");
+        // Prevent unbounded total supply from fuzzer values
+        require(totalSupply + amount <= MAX_TOTAL_SUPPLY, "TotalSupply cap");
         balanceOf[to] += amount;
         totalSupply += amount;
     }
@@ -27,6 +37,8 @@ contract MockUSDC {
 
     function transfer(address to, uint256 amount) external returns (bool) {
         require(balanceOf[msg.sender] >= amount, "Insufficient balance");
+        // Prevent overflow when crediting recipient
+        require(balanceOf[to] + amount >= balanceOf[to], "Transfer overflow");
         balanceOf[msg.sender] -= amount;
         balanceOf[to] += amount;
         return true;
@@ -35,6 +47,8 @@ contract MockUSDC {
     function transferFrom(address from, address to, uint256 amount) external returns (bool) {
         require(balanceOf[from] >= amount, "Insufficient balance");
         require(allowance[from][msg.sender] >= amount, "Allowance too low");
+        // Prevent overflow when crediting recipient
+        require(balanceOf[to] + amount >= balanceOf[to], "Transfer overflow");
 
         allowance[from][msg.sender] -= amount;
         balanceOf[from] -= amount;

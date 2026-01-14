@@ -43,7 +43,7 @@ Checklist
 - [x] Tests pass locally
 - [ ] Open draft PR on remote repo (requires pushing branch to remote)
 - [ ] Add CI run results to PR when available
-- [ ] Frontend audit: ABI/hook mismatches found; see `frontend/FRONTEND_REVIEW.md` (recommend updating ABI and claim flow to use `claimBatch` / `previewClaim`)
+- [x] Frontend audit: ABI/hook mismatches found; see `frontend/FRONTEND_REVIEW.md` (updated `useRewards` ABI, `useEpochs` to use `epochs` getter, `stats` API to use `NextResponse.json`, and `app/page.tsx` claim button to call `claimBatch`)
 
 ---
 

@@ -53,7 +53,7 @@ async function index() {
     ).run(
       log.args.user,
       Number(log.args.epoch),
-      log.args.amount.toString(),
+      (log.args.amount ?? 0n).toString(),
       log.transactionHash
     );
   }

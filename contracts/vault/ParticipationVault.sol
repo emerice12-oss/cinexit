@@ -43,6 +43,11 @@ contract ParticipationVault {
 
     uint256 public epochStart;
 
+    mapping(address => address) public referrer;
+    mapping(address => uint256) public referralVolume;
+
+    uint256 public constant REFERRAL_BPS = 500; // 5%
+
     /* ========== EVENTS ========== */
 
     event Deposit(address indexed user, uint256 amount);
@@ -233,5 +238,11 @@ contract ParticipationVault {
         return epochManager == address(0)
             ? 1
             : EpochManager(epochManager).currentEpoch();
+    }
+
+    function registerReferrer(address _referrer) external {
+        require(referrer[msg.sender] == address(0), 'Already set');
+        require(_referrer != msg.sender, 'self-referral');
+        referrer[msg.sender] = _referrer;
     }
 }

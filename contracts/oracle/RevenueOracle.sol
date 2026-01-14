@@ -14,6 +14,12 @@ contract RevenueOracle {
 
     mapping(uint256 => bool) public epochUsed;
 
+    uint256 public constant TIMELOCK = 2 days;
+    mapping(bytes32 => uint256) public queuedAt;
+
+    // Owner for administrative actions
+    address public owner;
+
     event EpochAttested(uint256 indexed epochId, uint256 revenueUSDC);
     event SignerAdded(address signer);
     event SignerRemoved(address signer);
@@ -23,11 +29,28 @@ contract RevenueOracle {
         _;
     }
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
+    modifier timelocked(bytes32 action) {
+        uint256 t = queuedAt[action];
+        require(t != 0 && block.timestamp >= t + TIMELOCK, "TIMELOCK");
+        _;
+        delete queuedAt[action];
+    }
+
+    function queueAction(bytes32 action) external onlyOwner {
+        queuedAt[action] = block.timestamp;
+    }
+
     constructor(
         address _epochManager,
         address[] memory _signers,
         uint256 _quorum
     ) {
+        owner = msg.sender;
         require(_signers.length >= _quorum, "Invalid quorum");
 
         epochManager = EpochManager(_epochManager);
@@ -136,11 +159,16 @@ contract RevenueOracle {
         emit SignerRemoved(s);
     }
 
-    function signerCount() external view returns (uint256) {
-        return signers.length;
-    }
-
-    function lastEpoch() external view returns (uint256) {
-        return latestEpoch;
+    // Admin function: timelocked owner action to add a signer
+    function adminAddSigner(address signer)
+        external
+        onlyOwner
+        timelocked(keccak256("ADD_SIGNER"))
+    {
+        require(signer != address(0), "Zero signer");
+        require(!isSigner[signer], "Duplicate signer");
+        isSigner[signer] = true;
+        signerCount++;
+        emit SignerAdded(signer);
     }
 }

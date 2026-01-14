@@ -20,20 +20,42 @@ contract EpochManager {
 
     mapping(uint256 => Epoch) public epochs;
 
+    // Ownership and timelock utilities
+    address public owner;
+    uint256 public constant TIMELOCK = 2 days;
+    mapping(bytes32 => uint256) public queuedAt;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
+    modifier timelocked(bytes32 action) {
+        uint256 t = queuedAt[action];
+        require(t != 0 && block.timestamp >= t + TIMELOCK, "TIMELOCK");
+        _;
+        delete queuedAt[action];
+    }
+
+    function queueAction(bytes32 action) external onlyOwner {
+        queuedAt[action] = block.timestamp;
+    }
+
     event EpochFinalized(uint256 indexed epoch, uint256 rewards);
 
     constructor(address _breaker, address _vault, address _distributor) {
+        owner = msg.sender;
         breaker = CircuitBreaker(_breaker);
         vault = ParticipationVault(_vault);
         distributor = RewardDistributor(_distributor);
         currentEpoch = 1;
     }
 
-    function setBreaker(address _breaker) external {
+    function setBreaker(address _breaker) external onlyOwner {
         breaker = CircuitBreaker(_breaker);
     }
 
-    function setDistributor(address _distributor) external {
+    function setDistributor(address _distributor) external onlyOwner {
         distributor = RewardDistributor(_distributor);
     }
 

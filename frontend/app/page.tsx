@@ -1,358 +1,161 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
-import { parseUnits, formatUnits } from 'viem';
-import { useBatchClaim } from '@/hooks/useBatchClaim';
-import { useProtocolGuard } from '@/hooks/useProtocolGuard';
-import { useEpochHistory } from '@/hooks/useEpochHistory';
-import { useOracleStatus } from '@/hooks/useOracleStatus';
+import { useEffect, useState } from 'react'
+import { useAccount, useChainId, useContractRead } from 'wagmi'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
 
-import {
-  useApproveUsdc,
-  useDepositUsdc,
-  useUsdcAllowance,
-  useDepositedBalance,
-  USDC_ADDRESS,
-  CINEXIT_MINING_ADDRESS,
-} from '@/hooks/useUsdcDeposit';
+// --- Replace these with your deployed contract addresses ---
+const MOCK_USDC_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+const REWARD_DISTRIBUTOR_ADDRESS = '0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496'
 
-import {
-  useClaimableRewards,
-  useClaimRewards,
-  REWARD_DISTRIBUTOR,
-} from '@/hooks/useRewards';
+// --- Import ABIs ---
+import { usdcAbi } from '../lib/abis/usdc'
+import { epochAbi } from '../lib/abis/epoch'
 
-import {
-  useCurrentEpoch,
-  useEpochFinalized,
-  useEpochRevenue,
-} from '@/hooks/useEpochs';
+import { useEpochRevenues } from '@/hooks/useEpochRevenues'
+import { VAULT_ABI } from '@/lib/abis/analytics'
 
+// --- Contract addresses (prefer env var) ---
+const EPOCH_MANAGER_ADDRESS =
+  (process.env.NEXT_PUBLIC_EPOCH_MANAGER_ADDRESS as `0x${string}`) ||
+  '0xYourEpochManagerAddress' // replace with deployed EpochManager
 
-export default function Home() {
-  const { address } = useAccount();
-  const [amount, setAmount] = useState('');
+// --- Types ---
+interface Epoch {
+  epoch: number
+  usdc: number
+}
 
-  const { data: allowance } = useUsdcAllowance(address);
-  const { data: deposited } = useDepositedBalance(address);
+// --- Dashboard Component ---
+export default function Dashboard() {
+  const { address, isConnected } = useAccount()
+  const chainId = useChainId()
+  const [epochs, setEpochs] = useState<Epoch[]>([])
+  const [balance, setBalance] = useState<number>(0)
+  const [loading, setLoading] = useState(false)
 
-  const { data: rewards } = useClaimableRewards(address);
+  // --- Network lock ---
+  const correctChainId = 1 // Hardhat local network; replace with your chain
+  const wrongNetwork = isConnected && chainId !== correctChainId
 
-  const { writeContract: approve } = useApproveUsdc();
-  const { writeContract: deposit } = useDepositUsdc();
-  const { writeContract: claim } = useClaimRewards();
+  // --- Fetch USDC Balance ---
+  const { data: balanceData } = useContractRead({
+    address: MOCK_USDC_ADDRESS,
+    abi: usdcAbi,
+    functionName: 'balanceOf',
+    args: [address || '0x0000000000000000000000000000000000000000'],
+  })
 
-  const { data: currentEpoch } = useCurrentEpoch();
+  useEffect(() => {
+    if (balanceData) {
+      // USDC has 6 decimals
+      setBalance(Number(balanceData) / 1e6)
+    }
+  }, [balanceData])
 
-  const [batchEpochs, setBatchEpochs] = useState<string>('');
+  // --- Fetch Epoch Rewards (hook-based) ---
+  const { data: epochRevenues, isLoading: loadingRevs } = useEpochRevenues(
+    EPOCH_MANAGER_ADDRESS,
+    10
+  )
 
-  const { writeContract: claimBatch } = useBatchClaim();
+  useEffect(() => {
+    if (!isConnected || wrongNetwork || !address) return
 
-  const { paused, wrongChain } = useProtocolGuard();
+    if (loadingRevs) {
+      setLoading(true)
+      return
+    }
 
-  const protocolBlocked = paused || wrongChain;
+    if (!epochRevenues) {
+      setEpochs([])
+      setLoading(false)
+      return
+    }
 
-  const { history, loading: historyLoading } =
-  useEpochHistory();
+    const temp: Epoch[] = epochRevenues.map((usdc, idx) => ({ epoch: idx + 1, usdc }))
+    setEpochs(temp)
+    setLoading(false)
+  }, [isConnected, address, wrongNetwork, epochRevenues, loadingRevs])
 
-  const oracle = useOracleStatus();
-
-
-
-const lastEpoch =
-  currentEpoch && currentEpoch > 0n
-    ? currentEpoch - 1n
-    : undefined;
-
-const { data: finalized } = useEpochFinalized(lastEpoch);
-const { data: revenue } = useEpochRevenue(lastEpoch);
-
-
-  const parsedAmount =
-    amount && Number(amount) > 0
-      ? parseUnits(amount, 6)
-      : 0n;
-
-  const needsApproval =
-    parsedAmount > 0n &&
-    (allowance ?? 0n) < parsedAmount;
-
-  function parseEpochs(batchEpochs: string): readonly bigint[] {
-    return batchEpochs
-      .split(',')
-      .map((e) => e.trim())
-      .filter(Boolean)
-      .map((e) => BigInt(e));
+  const ref = searchParams.get('ref')
+ if (ref && isConnected) {
+    writeContract({
+      address: PARTICIPATING_VAULT_ADDRESS,
+      abi: VAULT_ABI,
+      functionName: 'registerReferrer',
+      args: [ref],
+    })
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-8">
-      <ConnectButton />
+    <main className="min-h-screen flex flex-col items-center justify-start gap-8 p-6 bg-dark-50">
+      <h1 className="text-3xl font-bold text-white">Cinexit Dashboard</h1>
 
-      {paused && (
-        <div className="bg-red-600 text-white px-4 py-2 rounded">
-          Protocol is paused for safety. Actions disabled.
+      {!isConnected && (
+        <div className="p-4 bg-white text-black rounded-md">
+          Connect your wallet to view your dashboard.
         </div>
       )}
 
-      {wrongChain && (
-        <div className="bg-yellow-500 text-black px-4 py-2 rounded">
-          Wrong network connected. Please switch chains.
+      {/* --- Connect Wallet Button --- */}
+      {!isConnected && (
+        <div className="mb-4">
+          <ConnectButton />
         </div>
       )}
 
-      {address && (
-        <>
-          {/* Deposit Panel */}
-          <div className="flex gap-2">
-            <input
-              className="border px-3 py-2 rounded"
-              placeholder="USDC amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
+      {/* --- Network Warning --- */}
+      {wrongNetwork && (
+        <div className="p-4 bg-red-100 text-red-700 rounded-md">
+          ⚠️ Please switch to the correct network to view your rewards.
+        </div>
+      )}
 
-            {needsApproval ? (
-              <button
-                disabled={protocolBlocked}
-                className={`px-4 py-2 rounded ${
-                  protocolBlocked
-                    ? 'bg-gray-400'
-                    : 'bg-green-600 text-white'
-                }`}
+      {/* --- Wallet Info --- */}
+      {isConnected && !wrongNetwork && (
+        <div className="p-6 bg-white rounded-xl shadow-md w-full max-w-md">
+          <h2 className="text-xl font-semibold">Wallet</h2>
+          <p className="mt-2 text-gray-700 break-all">{address}</p>
+          <p className="mt-2 font-semibold text-lg">USDC Balance: {balance.toFixed(2)} USDC</p>
+          <p className="mt-1 text-sm text-gray-500">Estimated daily income: ${(balance * 0.027).toFixed(2)}</p>
+        </div>
+      )}
 
-                onClick={() =>
-                  approve({
-                    address: USDC_ADDRESS,
-                    abi: [
-                      {
-                        name: 'approve',
-                        type: 'function',
-                        stateMutability: 'nonpayable',
-                        inputs: [
-                          { name: 'spender', type: 'address' },
-                          { name: 'amount', type: 'uint256' },
-                        ],
-                        outputs: [{ name: '', type: 'bool' }],
-                      },
-                    ],
-                    functionName: 'approve',
-                    args: [CINEXIT_MINING_ADDRESS, parsedAmount],
-                  })
-                }
-              >
-                Approve USDC
-              </button>
-            ) : (
-              <button
-                className="bg-green-600 text-white px-4 py-2 rounded"
-                onClick={() =>
-                  deposit({
-                    address: CINEXIT_MINING_ADDRESS,
-                    abi: [
-                      {
-                        name: 'deposit',
-                        type: 'function',
-                        stateMutability: 'nonpayable',
-                        inputs: [{ name: 'amount', type: 'uint256' }],
-                        outputs: [],
-                      },
-                    ],
-                    functionName: 'deposit',
-                    args: [parsedAmount],
-                  })
-                }
-              >
-                Deposit & Mine
-              </button>
-            )}
-          </div>
+      {/* --- Loading Indicator --- */}
+      {loading && <div className="p-4 bg-gray-100 text-gray-700 rounded-md">Fetching rewards...</div>}
 
-          {/* Balances */}
-          <div className="text-sm text-gray-600">
-            Deposited: {formatUnits(deposited ?? 0n, 6)} USDC
-          </div>
+      {/* --- Rewards Chart --- */}
+      {epochs.length > 0 && (
+        <div className="w-full max-w-3xl h-80 bg-white p-4 rounded-xl shadow-md">
+          <h2 className="text-xl font-semibold mb-2">Epoch Rewards</h2>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={epochs}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="epoch" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="usdc" stroke="#4ade80" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
-          {/* Rewards */}
-          <div className="border rounded p-4 w-80 text-center">
-            <div className="text-lg font-semibold">
-              Claimable Rewards
-            </div>
-
-            <div className="text-2xl my-2">
-              {formatUnits(rewards ?? 0n, 6)} USDC
-            </div>
-
-            <button
-              className="bg-purple-600 text-white px-4 py-2 rounded w-full"
-              disabled={
-                protocolBlocked || !rewards || rewards === 0n || batchEpochs.trim() === ''
-              }
-              onClick={() => {
-                const epochs = parseEpochs(batchEpochs);
-                if (epochs.length === 0) return;
-                claimBatch({
-                  address: REWARD_DISTRIBUTOR,
-                  abi: [
-                    {
-                      name: 'claimBatch',
-                      type: 'function',
-                      stateMutability: 'nonpayable',
-                      inputs: [{ name: 'epochs', type: 'uint256[]' }],
-                      outputs: [],
-                    },
-                  ],
-                  functionName: 'claimBatch',
-                  args: [epochs],
-                });
-              }}
-            >
-              Claim Rewards
-            </button>
-          </div>
-
-            {/* Epoch Info */}
-            <div className="border rounded p-4 w-80 text-center">
-              <div className="text-lg font-semibold">
-                Epoch Status
-              </div>
-
-              <div className="mt-2 text-sm">
-                Current Epoch:{' '}
-                <b>{currentEpoch?.toString() ?? '-'}</b>
-              </div>
-
-              {lastEpoch !== undefined && (
-                <>
-                  <div className="mt-2 text-sm">
-                    Last Epoch:{' '}
-                    <b>{lastEpoch.toString()}</b>
-                  </div>
-
-                  <div className="mt-1 text-sm">
-                    Finalized:{' '}
-                    <b>{finalized ? 'YES' : 'NO'}</b>
-                  </div>
-
-                  <div className="mt-1 text-sm">
-                    Revenue:{' '}
-                    <b>
-                      {revenue
-                        ? `${Number(revenue) / 1e6} USDC`
-                        : '—'}
-                    </b>
-                  </div>
-                </>
-             )}
-           </div>
-
-           {/* Batch Claim */}
-           <div className="border rounded p-4 w-80 text-center">
-             <div className="text-lg font-semibold">
-               Batch Claim
-             </div>
-
-            <input
-              className="border px-3 py-2 rounded w-full mt-2"
-              placeholder="Epochs e.g. 1,2,3"
-              value={batchEpochs}
-              onChange={(e) => setBatchEpochs(e.target.value)}
-            />
-            <button
-              
-              className="bg-indigo-600 text-white px-4 py-2 rounded w-full mt-3"
-              disabled={protocolBlocked || !batchEpochs}
-              onClick={() =>
-                claimBatch({
-                  address: REWARD_DISTRIBUTOR,
-                  abi: [
-                    {
-                      name: 'claimBatch',
-                      type: 'function',
-                      stateMutability: 'nonpayable',
-                      inputs: [
-                        { name: 'epochs', type: 'uint256[]' },
-                      ],
-                      outputs: [],
-                    },
-                  ],
-                  functionName: 'claimBatch',
-                  args: [parseEpochs(batchEpochs)],
-                })
-              }
-            >
-              Claim Selected Epochs
-            </button>
-
-            <div className="text-xs text-gray-500 mt-2">
-              Saves gas vs claiming one-by-one
-            </div>
-          </div>
-
-          {/* Claim History */}
-          <div className="border rounded p-4 w-full max-w-xl">
-            <div className="text-lg font-semibold mb-2">
-              Claim History
-            </div>
-
-            {historyLoading && (
-              <div className="text-sm text-gray-500">
-                Loading history…
-              </div>
-            )}
-
-            {!historyLoading && history.length === 0 && (
-              <div className="text-sm text-gray-500">
-                No claims yet.
-              </div>
-            )}
-
-            <ul className="divide-y">
-              {history.map((h, i) => (
-                <li
-                  key={i}
-                  className="flex justify-between py-2 text-sm"
-                >
-                  <span>Epoch #{h.epoch.toString()}</span>
-                  <span>
-                    {(Number(h.amount) / 1e6).toFixed(2)} USDC
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Oracle Transparency */}
-<div className="border rounded p-4 w-full max-w-xl">
-  <div className="text-lg font-semibold mb-2">
-    Oracle Status
-  </div>
-
-  <div className="text-sm space-y-1">
-    <div>
-      Signers: {oracle.signerCount}
-    </div>
-    <div>
-      Quorum required: {oracle.quorum}
-    </div>
-    <div>
-      Last settled epoch: #{oracle.lastEpoch}
-    </div>
-  </div>
-
-  {oracle.signerCount > 0 &&
-    oracle.quorum >
-      oracle.signerCount / 2 && (
-      <div className="mt-2 text-green-600 text-sm">
-        ✔ Majority-secured oracle
-      </div>
-    )}
-</div>
-
-        </>
+      {/* --- Epoch List --- */}
+      {epochs.length > 0 && (
+        <div className="w-full max-w-3xl p-4 bg-white rounded-xl shadow-md">
+          <h2 className="text-xl font-semibold mb-2">Recent Epochs</h2>
+          <ul className="divide-y divide-gray-200">
+            {epochs.map((e) => (
+              <li key={e.epoch} className="py-2 flex justify-between">
+                <span>Epoch {e.epoch}</span>
+                <span>{e.usdc.toFixed(2)} USDC</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </main>
-  );
+  )
 }
