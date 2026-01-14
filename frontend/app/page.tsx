@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useAccount, useChainId, useContractRead } from 'wagmi'
+import { useAccount, useChainId, useContractRead, useWriteContract } from 'wagmi'
+import { useSearchParams } from 'next/navigation'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
 
@@ -79,10 +80,13 @@ export default function Dashboard() {
     setLoading(false)
   }, [isConnected, address, wrongNetwork, epochRevenues, loadingRevs])
 
-  const ref = searchParams.get('ref')
- if (ref && isConnected) {
+  const searchParams = useSearchParams()
+  const { writeContract } = useWriteContract()
+  const ref = searchParams?.get('ref')
+  
+  if (ref && isConnected) {
     writeContract({
-      address: PARTICIPATING_VAULT_ADDRESS,
+      address: VAULT_ADDRESS as `0x${string}`,
       abi: VAULT_ABI,
       functionName: 'registerReferrer',
       args: [ref],
