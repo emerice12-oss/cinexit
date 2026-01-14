@@ -4,6 +4,9 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 import "../../contracts/core/RewardDistributor.sol";
 import "../../contracts/test/mocks/MockUSDC.sol";
+import "../../contracts/core/EpochManager.sol";
+import "../../contracts/vault/ParticipationVault.sol";
+import "../../contracts/governance/CircuitBreaker.sol";
 
 contract OracleSettlementFuzz is Test {
     RewardDistributor distributor;
