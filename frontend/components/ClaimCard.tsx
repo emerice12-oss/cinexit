@@ -4,10 +4,7 @@ import { useWriteContract } from 'wagmi'
 import { useTx } from '@/lib/hooks/useTx'
 import { distributorAbi } from '@/lib/abis/distributor'
 import RequireWalletAndNetwork from '@/components/RequireWalletAndNetwork'
-
-const DISTRIBUTOR_ADDRESS = '0xRewardDistributor'
-
-queryClient.invalidateQueries()
+import { DISTRIBUTOR_ADDRESS } from '@/lib/contracts'
 
 export default function ClaimCard() {
   const tx = useTx()

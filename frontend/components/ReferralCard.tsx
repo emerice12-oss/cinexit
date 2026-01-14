@@ -1,6 +1,9 @@
+'use client'
+
+import { useAccount } from 'wagmi'
+import { useReferralStats } from '@/hooks/useReferralStats'
+
 export function ReferralCard() {
-  const { address } = useAccount()
-  const { referrer, volume } = useReferralStats()
 
   const link = `${window.location.origin}/?ref=${address}`
 

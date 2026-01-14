@@ -7,7 +7,8 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianG
 
 export default function EpochsPage() {
   const { isConnected } = useAccount()
-  const { epochs, loading } = useEpochHistory()
+  const { history = [], loading } = useEpochHistory()
+  const epochs = history
 
   return (
     <main className="min-h-screen p-6 bg-dark-50 text-white">
@@ -51,7 +52,7 @@ export default function EpochsPage() {
               </tr>
             </thead>
             <tbody>
-              {epochs.map((e) => (
+              {epochs.map((e: any) => (
                 <tr key={e.epoch} className="border-t">
                   <td className="p-3">{e.epoch}</td>
                   <td className="p-3">{e.revenue.toFixed(2)}</td>

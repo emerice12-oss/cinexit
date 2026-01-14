@@ -1,31 +1,18 @@
 'use client'
 
+import { useState } from 'react'
 import { parseUnits } from 'viem'
 import { useWriteContract } from 'wagmi'
 import { useTx } from '@/lib/hooks/useTx'
-import { epochAbi } from '@/lib/abis/epoch'
 import { distributorAbi } from '@/lib/abis/distributor'
 import RequireWalletAndNetwork from './RequireWalletAndNetwork'
-import { useReferral } from '@/hooks/useReferral'
+import { VAULT_ADDRESS } from '@/lib/contracts'
 
-const USDC_ADDRESS = '0xYourMockOrRealUSDC'
-const DISTRIBUTOR_ADDRESS = '0xParticipationVault'
 const USDC_DECIMALS = 6
-
-const referrer = useReferral()
-
-await writeContractAsync({
-  address: VAULT,
-  abi: vaultAbi,
-  functionName: 'deposit',
-  args: [value, referrer ?? ZERO_ADDRESS],
-})
-
-
-queryClient.invalidateQueries()
-
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export default function DepositCard() {
+  const [amount, setAmount] = useState('')
   const tx = useTx()
   const { writeContractAsync } = useWriteContract()
 
