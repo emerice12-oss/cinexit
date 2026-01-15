@@ -64,7 +64,9 @@ contract BatchClaimTest is BaseTest {
 
         // Batch claim
         uint256[] memory epochs = new uint256[](3);
-        epochs[0] = 1; epochs[1] = 2; epochs[2] = 3;
+        epochs[0] = 1;
+        epochs[1] = 2;
+        epochs[2] = 3;
 
         vm.startPrank(alice);
         distributor.claimBatch(epochs);

@@ -26,11 +26,7 @@ contract RewardDistributorInvariant is Test {
 
         // create placeholder epoch manager and distributor
         epochManager = new EpochManager(address(breaker), address(vault), address(0));
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         epochManager.setDistributor(address(distributor));
         vault.setEpochManager(address(epochManager));

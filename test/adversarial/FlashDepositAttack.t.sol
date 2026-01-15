@@ -24,11 +24,7 @@ contract FlashDepositAttackTest is Test {
         breaker = new CircuitBreaker();
         epochManager = new EpochManager(address(breaker), address(vault), address(0));
 
-        distributor = new RewardDistributor(
-            address(vault),
-            address(usdc),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(usdc), address(epochManager));
 
         vault.setEpochManager(address(epochManager));
         epochManager.setDistributor(address(distributor));

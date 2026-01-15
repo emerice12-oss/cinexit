@@ -29,11 +29,7 @@ contract WhaleWeightAttackTest is Test {
 
         // setup breaker, fund treasury, and distributor
         CircuitBreaker breaker = new CircuitBreaker();
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         vault.setEpochManager(address(epochManager));
         vault.setBreaker(address(breaker));

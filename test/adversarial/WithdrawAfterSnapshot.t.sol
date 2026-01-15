@@ -28,11 +28,7 @@ contract WithdrawAfterSnapshotTest is Test {
 
         treasury = new Treasury(address(usdc));
 
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         vault.setEpochManager(address(epochManager));
         epochManager.setDistributor(address(distributor));

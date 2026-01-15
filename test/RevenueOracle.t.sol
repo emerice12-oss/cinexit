@@ -5,7 +5,6 @@ import "forge-std/Test.sol";
 import "./BaseTest.t.sol";
 
 contract RevenueOracleTest is BaseTest {
-
     function test_RevertIfNotEnoughSignatures() public {
         // prepare a non-empty but insufficient signatures array
         bytes[] memory sigs = new bytes[](0); // or any shorter-than-required length
@@ -20,7 +19,12 @@ contract RevenueOracleTest is BaseTest {
 
         uint256 q = oracle.quorum();
 
-        bytes32 ethSigned = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", keccak256(abi.encodePacked(address(oracle), epochId, revenue, block.chainid))));
+        bytes32 ethSigned = keccak256(
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n32",
+                keccak256(abi.encodePacked(address(oracle), epochId, revenue, block.chainid))
+            )
+        );
 
         // Sign with signer keys from BaseTest (signerKey1, signerKey2)
         bytes[] memory sigs1 = new bytes[](q);

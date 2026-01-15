@@ -30,11 +30,7 @@ contract BatchClaimReplayTest is Test {
 
         epochManager = new EpochManager(address(breaker), address(vault), address(0));
 
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         // wire contracts
         vault.setEpochManager(address(epochManager));
@@ -90,10 +86,6 @@ contract BatchClaimReplayTest is Test {
         uint256 balanceAfterReplay = usdc.balanceOf(alice);
 
         // Balance must not increase
-        assertEq(
-            balanceAfterReplay,
-            balanceAfterFirstClaim,
-            "Replay batch claim paid rewards twice"
-        );
+        assertEq(balanceAfterReplay, balanceAfterFirstClaim, "Replay batch claim paid rewards twice");
     }
 }

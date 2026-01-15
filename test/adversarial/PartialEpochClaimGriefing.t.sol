@@ -27,11 +27,7 @@ contract PartialEpochClaimGriefingTest is Test {
 
         treasury = new Treasury(address(usdc));
 
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
         // fund treasury for the 3 epochs
         usdc.mint(address(treasury), 6_000e6);
 

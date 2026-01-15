@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useAccount, useChainId, useContractRead, useWriteContract } from 'wagmi'
-import { useSearchParams } from 'next/navigation'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
+import { VAULT_ADDRESS } from '@/lib/contracts'
 
 // --- Replace these with your deployed contract addresses ---
 const MOCK_USDC_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
@@ -80,18 +80,26 @@ export default function Dashboard() {
     setLoading(false)
   }, [isConnected, address, wrongNetwork, epochRevenues, loadingRevs])
 
-  const searchParams = useSearchParams()
   const { writeContract } = useWriteContract()
-  const ref = searchParams?.get('ref')
-  
-  if (ref && isConnected) {
-    writeContract({
-      address: VAULT_ADDRESS as `0x${string}`,
-      abi: VAULT_ABI,
-      functionName: 'registerReferrer',
-      args: [ref],
-    })
-  }
+
+  // Read referral param on the client only to avoid SSR/prerender issues
+  useEffect(() => {
+    if (!isConnected) return
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const ref = params.get('ref')
+      if (ref) {
+        writeContract({
+          address: VAULT_ADDRESS as `0x${string}`,
+          abi: VAULT_ABI,
+          functionName: 'registerReferrer',
+          args: [ref],
+        })
+      }
+    } catch (err) {
+      // ignore in non-browser environments
+    }
+  }, [isConnected, writeContract])
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-start gap-8 p-6 bg-dark-50">

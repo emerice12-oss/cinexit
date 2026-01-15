@@ -29,11 +29,7 @@ contract FlashDepositWithdrawTest is Test {
 
         epochManager = new EpochManager(address(breaker), address(vault), address(0));
 
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         vault.setEpochManager(address(epochManager));
         epochManager.setDistributor(address(distributor));
@@ -91,10 +87,6 @@ contract FlashDepositWithdrawTest is Test {
         assertGt(honestAfter, honestBefore, "Honest user not rewarded");
 
         // Attacker may get tiny rounding dust at most — but no profit
-        assertLe(
-            attackerAfter,
-            attackerBefore,
-            "Flash attacker profited"
-        );
+        assertLe(attackerAfter, attackerBefore, "Flash attacker profited");
     }
 }

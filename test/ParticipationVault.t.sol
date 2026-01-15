@@ -51,10 +51,7 @@ contract ParticipationVaultTest is BaseTest {
         uint256 weighted = EpochMath.weightedBalance(200_000e6);
 
         // Tiered calculation: 1k*1 + 9k*0.7 + 90k*0.4 + 100k*0.2
-        uint256 expected = 1_000e6
-            + (9_000e6 * 70) / 100
-            + (90_000e6 * 40) / 100
-            + (100_000e6 * 20) / 100;
+        uint256 expected = 1_000e6 + (9_000e6 * 70) / 100 + (90_000e6 * 40) / 100 + (100_000e6 * 20) / 100;
 
         assertEq(weighted, expected);
     }

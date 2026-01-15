@@ -19,10 +19,10 @@ import {RevenueOracle} from "../Contracts/oracle/RevenueOracle.sol";
 
 contract Deploy is Script {
     // ============ CONFIG ============
-    address public USDC;                // network-specific
-    address public PAUSER;              // multisig
-    uint256 public EPOCH_DURATION;      // seconds (e.g. 1 days)
-    uint256 public ORACLE_QUORUM;        // e.g. 3
+    address public USDC; // network-specific
+    address public PAUSER; // multisig
+    uint256 public EPOCH_DURATION; // seconds (e.g. 1 days)
+    uint256 public ORACLE_QUORUM; // e.g. 3
 
     function setUp() public {
         // ======== EDIT THESE BEFORE MAINNET ========
@@ -47,18 +47,10 @@ contract Deploy is Script {
         ParticipationVault vault = new ParticipationVault(USDC);
 
         // 5️⃣ Epoch Manager (distributor not yet deployed; pass zero and set later)
-        EpochManager epochManager = new EpochManager(
-            address(breaker),
-            address(vault),
-            address(0)
-        );
+        EpochManager epochManager = new EpochManager(address(breaker), address(vault), address(0));
 
         // 6️⃣ Reward Distributor
-        RewardDistributor distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        RewardDistributor distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         // 7️⃣ Wire up epoch manager -> distributor now that it's deployed
         epochManager.setDistributor(address(distributor));
@@ -73,11 +65,7 @@ contract Deploy is Script {
         uint256 quorum = ORACLE_QUORUM == 0 ? 1 : ORACLE_QUORUM;
         if (quorum > initialSigners.length) quorum = initialSigners.length;
 
-        RevenueOracle oracle = new RevenueOracle(
-            address(epochManager),
-            initialSigners,
-            quorum
-        );
+        RevenueOracle oracle = new RevenueOracle(address(epochManager), initialSigners, quorum);
 
         // ============ PERMISSIONS ============
         // Treasury: set distributor
@@ -86,7 +74,6 @@ contract Deploy is Script {
         // Distributor: nothing to set (vault passed in constructor)
 
         // EpochManager: finalized hooks are implicit; Oracle will call finalizeEpoch when attesting
-
 
         vm.stopBroadcast();
 

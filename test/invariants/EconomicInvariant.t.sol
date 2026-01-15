@@ -20,7 +20,7 @@ contract EconomicInvariantTest is StdInvariant, Test {
     CircuitBreaker breaker;
 
     address alice = address(0xA11CE);
-    address bob   = address(0xB0B);
+    address bob = address(0xB0B);
 
     function setUp() public {
         // Deploy mock USDC
@@ -69,9 +69,8 @@ contract EconomicInvariantTest is StdInvariant, Test {
         uint256 treasuryBalance = usdc.balanceOf(address(treasury));
 
         // Sum of balances in protocol + external accounts should equal total supply
-        uint256 accounted = vaultBalance + distributorBalance + treasuryBalance
-            + usdc.balanceOf(alice)
-            + usdc.balanceOf(bob);
+        uint256 accounted =
+            vaultBalance + distributorBalance + treasuryBalance + usdc.balanceOf(alice) + usdc.balanceOf(bob);
 
         assertEq(totalSupply, accounted, "USDC conservation broken");
     }

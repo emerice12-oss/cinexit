@@ -32,7 +32,7 @@ export default function InvestmentPage() {
     pendingReward,
   } = useInvestmentStatus()
 
-  const epoch = useCurrentEpoch()
+  const { epoch = 0n } = useCurrentEpoch()
   const dailyIncome = estimateDailyIncome(depositAmount)
 
   return (
@@ -48,7 +48,7 @@ export default function InvestmentPage() {
               {isPaused ? 'System Paused' : isActive ? 'Running' : 'Inactive'}
             </span>
           </p>
-          <p>Current Epoch: {epoch}</p>
+          <p>Current Epoch: {epoch.toString()}</p>
         </div>
 
         {/* Capital */}

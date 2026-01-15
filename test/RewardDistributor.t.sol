@@ -7,21 +7,17 @@ import "./BaseTest.t.sol";
 contract RewardDistributorTest is BaseTest {
     RewardDistributor rewardDistributor; // ✅ VARIABLE
     uint256 internal epochId;
-    
+
     function setUp() public override {
         super.setUp();
         vault = new ParticipationVault(address(usdc));
 
         epochId = 1;
 
-        rewardDistributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        rewardDistributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         vault.setEpochManager(address(epochManager)); // ✅ now valid
-    
+
         // Mint USDC to Alice and Bob
         usdc.mint(alice, 5_000e6);
         usdc.mint(bob, 10_000e6);

@@ -27,11 +27,7 @@ contract ReentrancyClaimAttackTest is Test {
 
         treasury = new Treasury(address(usdc));
 
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         vault.setEpochManager(address(epochManager));
         epochManager.setDistributor(address(distributor));
@@ -57,8 +53,7 @@ contract ReentrancyClaimAttackTest is Test {
     }
 
     function test_ReentrancyOnClaimFails() public {
-        ReentrantClaimer evil =
-            new ReentrantClaimer(distributor, 1);
+        ReentrantClaimer evil = new ReentrantClaimer(distributor, 1);
 
         vm.prank(attacker);
         // claim should not allow reentrancy farming; ensure balance remains bounded

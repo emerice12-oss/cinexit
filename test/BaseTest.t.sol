@@ -13,10 +13,10 @@ import "../contracts/oracle/RevenueOracle.sol";
 
 contract BaseTest is Test {
     address internal alice = address(0x1000000000000000000000000000000000000001);
-    address internal bob   = address(0x2000000000000000000000000000000000000002);
+    address internal bob = address(0x2000000000000000000000000000000000000002);
     address internal carol = address(0x3000000000000000000000000000000000000003);
     address internal charlie = address(0x4000000000000000000000000000000000000004);
-    address internal admin  = address(0x5000000000000000000000000000000000000005);
+    address internal admin = address(0x5000000000000000000000000000000000000005);
     address internal attacker = address(0x6000000000000000000000000000000000000006);
 
     MockUSDC internal usdc;
@@ -37,26 +37,16 @@ contract BaseTest is Test {
         breaker = new CircuitBreaker();
 
         // Vault
-        vault = new ParticipationVault(
-            address(usdc)
-        );
+        vault = new ParticipationVault(address(usdc));
 
         // Treasury
         treasury = new Treasury(address(usdc));
 
         // Epoch manager (created first with distributor = address(0) to break circular dependency)
-        epochManager = new EpochManager(
-            address(breaker),
-            address(vault),
-            address(0)
-        );
+        epochManager = new EpochManager(address(breaker), address(vault), address(0));
 
         // Distributor (proper constructor args: vault, treasury, epochManager)
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         // Wire epoch manager to distributor
         epochManager.setDistributor(address(distributor));
@@ -68,11 +58,7 @@ contract BaseTest is Test {
         signers[0] = vm.addr(signerKey1);
         signers[1] = vm.addr(signerKey2);
 
-        oracle = new RevenueOracle(
-            address(epochManager),
-            signers,
-            2
-        );
+        oracle = new RevenueOracle(address(epochManager), signers, 2);
 
         // Wire contracts
         vault.setEpochManager(address(epochManager));
@@ -105,5 +91,4 @@ contract BaseTest is Test {
         // finalize in manager (announces rewards)
         epochManager.finalizeEpoch(rewards);
     }
-
 }

@@ -26,9 +26,7 @@ contract PauseFrontRunTest is Test {
         breaker = new CircuitBreaker();
 
         // Vault
-        vault = new ParticipationVault(
-            address(usdc)
-        );
+        vault = new ParticipationVault(address(usdc));
 
         // Treasury
         treasury = new Treasury(address(usdc));
@@ -37,11 +35,7 @@ contract PauseFrontRunTest is Test {
         epochManager = new EpochManager(address(breaker), address(vault), address(0));
 
         // Distributor
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         // Wire contracts
         epochManager.setDistributor(address(distributor));

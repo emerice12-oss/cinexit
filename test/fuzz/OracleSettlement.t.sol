@@ -19,11 +19,7 @@ contract OracleSettlementFuzz is Test {
     function setUp() public {
         usdc = new MockUSDC();
         vault = new ParticipationVault(address(usdc));
-        distributor = new RewardDistributor(
-            address(vault),
-            address(0),
-            address(0)
-        );
+        distributor = new RewardDistributor(address(vault), address(0), address(0));
 
         // create a breaker and epoch manager and wire it to the vault and distributor
         CircuitBreaker breaker = new CircuitBreaker();
@@ -34,9 +30,7 @@ contract OracleSettlementFuzz is Test {
         usdc.mint(address(distributor), 1_000_000e6);
     }
 
-    function testFuzz_settlementMonotonic(
-        uint256 amount
-    ) public {
+    function testFuzz_settlementMonotonic(uint256 amount) public {
         vm.assume(amount < 100_000e6);
 
         vm.prank(oracle);

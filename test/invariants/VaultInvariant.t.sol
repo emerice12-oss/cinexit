@@ -42,5 +42,4 @@ contract VaultInvariantTest is BaseTest {
 
         assertLe(sum, totalWeight);
     }
-
 }

@@ -49,11 +49,7 @@ contract ReentrancyEpochFinalizeTest is Test {
 
         epochManager = new EpochManager(address(breaker), address(vault), address(0));
 
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         vault.setEpochManager(address(epochManager));
         epochManager.setDistributor(address(distributor));

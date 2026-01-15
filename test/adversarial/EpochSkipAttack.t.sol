@@ -23,18 +23,10 @@ contract EpochSkipAttackTest is Test {
         vault = new ParticipationVault(address(usdc));
         breaker = new CircuitBreaker();
 
-        epochManager = new EpochManager(
-            address(breaker),
-            address(vault),
-            address(0)
-        );
+        epochManager = new EpochManager(address(breaker), address(vault), address(0));
 
         Treasury treasury = new Treasury(address(usdc));
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         epochManager.setDistributor(address(distributor));
         treasury.setDistributor(address(distributor));

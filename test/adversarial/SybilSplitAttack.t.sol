@@ -29,11 +29,7 @@ contract SybilSplitAttackTest is Test {
         // setup circuit breaker + treasury + distributor
         CircuitBreaker breaker = new CircuitBreaker();
         Treasury treasury = new Treasury(address(usdc));
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         vault.setEpochManager(address(epochManager));
         vault.setBreaker(address(breaker));

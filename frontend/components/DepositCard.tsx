@@ -6,7 +6,8 @@ import { useWriteContract } from 'wagmi'
 import { useTx } from '@/lib/hooks/useTx'
 import { distributorAbi } from '@/lib/abis/distributor'
 import RequireWalletAndNetwork from './RequireWalletAndNetwork'
-import { VAULT_ADDRESS } from '@/lib/contracts'
+import { DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/contracts'
+import { epochAbi } from '@/lib/abis/epoch'
 
 const USDC_DECIMALS = 6
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'

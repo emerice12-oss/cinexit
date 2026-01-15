@@ -26,11 +26,7 @@ contract ZeroWeightSnapshotTest is Test {
         epochManager = new EpochManager(address(breaker), address(vault), address(0));
 
         Treasury treasury = new Treasury(address(usdc));
-        distributor = new RewardDistributor(
-            address(vault),
-            address(treasury),
-            address(epochManager)
-        );
+        distributor = new RewardDistributor(address(vault), address(treasury), address(epochManager));
 
         vault.setEpochManager(address(epochManager));
         epochManager.setDistributor(address(distributor));
