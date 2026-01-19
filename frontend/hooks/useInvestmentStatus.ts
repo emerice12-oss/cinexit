@@ -11,21 +11,21 @@ export function useInvestmentStatus() {
   const { address } = useAccount()
 
   const { data: deposited } = useReadContract({
-    address: CONTRACTS.VAULT,
+    address: CONTRACTS.PARTICIPATION_VAULT_ADDRESS,
     abi: VAULT_ABI,
     functionName: 'balanceOf',
     args: address ? [address as `0x${string}`] : undefined,
   })
 
   const { data: pending } = useReadContract({
-    address: CONTRACTS.DISTRIBUTOR,
+    address: CONTRACTS.REWARD_DISTRIBUTOR_ADDRESS,
     abi: distributorAbi,
     functionName: 'pendingReward',
     args: address ? [address as `0x${string}`] : undefined,
   })
 
   const { data: paused } = useReadContract({
-    address: CONTRACTS.CIRCUIT_BREAKER,
+    address: CONTRACTS.CIRCUIT_BREAKER_ADDRESS,
     abi: CIRCUIT_BREAKER_ABI,
     functionName: 'paused',
   })

@@ -4,16 +4,15 @@ import { useEffect, useState } from 'react'
 import { useAccount, useChainId, useContractRead, useWriteContract } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
-import { VAULT_ADDRESS } from '@/lib/contracts'
+import { PARTICIPATION_VAULT_ADDRESS } from '@/lib/contracts'
 
 // --- Replace these with your deployed contract addresses ---
-const MOCK_USDC_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
-const REWARD_DISTRIBUTOR_ADDRESS = '0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496'
+const MOCK_USDC_ADDRESS = 
+  (process.env.NEXT_PUBLIC_MOCK_USDC_ADDRESS as `0x${string}`) ||
+  '0xYourMockUSDCAddress'  // replace with deployed MockUSDC
 
 // --- Import ABIs ---
 import { usdcAbi } from '../lib/abis/usdc'
-import { epochAbi } from '../lib/abis/epoch'
-
 import { useEpochRevenues } from '@/hooks/useEpochRevenues'
 import { VAULT_ABI } from '@/lib/abis/analytics'
 
@@ -90,7 +89,7 @@ export default function Dashboard() {
       const ref = params.get('ref')
       if (ref) {
         writeContract({
-          address: VAULT_ADDRESS as `0x${string}`,
+          address: PARTICIPATION_VAULT_ADDRESS as `0x${string}`,
           abi: VAULT_ABI,
           functionName: 'registerReferrer',
           args: [ref],

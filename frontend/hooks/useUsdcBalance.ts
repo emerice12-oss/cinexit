@@ -6,7 +6,7 @@ export function useUsdcBalance() {
   const { address } = useAccount()
 
   const { data, isLoading } = useReadContract({
-    address: CONTRACTS.USDC,
+    address: CONTRACTS.USDC_ADDRESS,
     abi: usdcAbi,
     functionName: 'balanceOf',
     args: address ? [address as `0x${string}`] : undefined,

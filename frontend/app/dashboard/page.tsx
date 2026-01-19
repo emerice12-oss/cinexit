@@ -17,7 +17,7 @@ export default function Dashboard() {
     return <div className="p-6">Connect your wallet.</div>
   }
 
-  if (chainId !== 31337) {
+  if (chainId !== 1) {
     return <div className="p-6 text-red-600">Wrong network</div>
   }
 

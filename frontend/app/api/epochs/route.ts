@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ethers } from 'ethers'
 
 // --- Config ---
-const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'https://mainnet.infura.io/v3/YOUR_KEY'
-const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || '0xYourVaultContract'
+const RPC_URL = process.env.NEXT_PUBLIC_MAINNET_RPC_URL || 'https://mainnet.infura.io/v3/YOUR_KEY'
+const VAULT_ADDRESS = process.env.NEXT_PUBLIC_PARTICIPATION_VAULT_ADDRESS || '0xYourVaultContract'
 
 // Minimal ABI for ParticipationVault: get epoch rewards
 const VAULT_ABI = [

@@ -9,14 +9,14 @@ export function useReferralStats() {
   const { address } = useAccount()
 
   const { data: referrer } = useReadContract({
-    address: CONTRACTS.VAULT,
+    address: CONTRACTS.PARTICIPATION_VAULT_ADDRESS,
     abi: VAULT_ABI,
     functionName: 'referrerOf',
     args: address ? [address] : undefined,
   })
 
   const { data: volume } = useReadContract({
-    address: CONTRACTS.VAULT,
+    address: CONTRACTS.PARTICIPATION_VAULT_ADDRESS,
     abi: VAULT_ABI,
     functionName: 'referralVolume',
     args: address ? [address] : undefined,

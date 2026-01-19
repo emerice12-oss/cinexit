@@ -10,7 +10,7 @@ export default function ClaimPage() {
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>()
 
   const { data: pending, refetch } = useReadContract({
-    address: process.env.NEXT_PUBLIC_DISTRIBUTOR as `0x${string}`,
+    address: process.env.NEXT_PUBLIC_DISTRIBUTOR_ADDRESS as `0x${string}`,
     abi: distributorAbi,
     functionName: 'pendingReward',
     args: address ? [address] : undefined,
@@ -30,7 +30,7 @@ export default function ClaimPage() {
 
   const claim = () => {
     writeContract({
-      address: process.env.NEXT_PUBLIC_DISTRIBUTOR as `0x${string}`,
+      address: process.env.NEXT_PUBLIC_DISTRIBUTOR_ADDRESS as `0x${string}`,
       abi: distributorAbi,
       functionName: 'claim',
     })

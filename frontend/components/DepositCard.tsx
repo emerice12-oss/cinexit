@@ -6,7 +6,7 @@ import { useWriteContract } from 'wagmi'
 import { useTx } from '@/lib/hooks/useTx'
 import { distributorAbi } from '@/lib/abis/distributor'
 import RequireWalletAndNetwork from './RequireWalletAndNetwork'
-import { DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/contracts'
+import { REWARD_DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/contracts'
 import { epochAbi } from '@/lib/abis/epoch'
 
 const USDC_DECIMALS = 6
@@ -26,12 +26,12 @@ export default function DepositCard() {
         address: USDC_ADDRESS,
         abi: epochAbi,
         functionName: 'approve',
-        args: [DISTRIBUTOR_ADDRESS, value],
+        args: [REWARD_DISTRIBUTOR_ADDRESS, value],
       })
 
       // deposit
       return writeContractAsync({
-        address: DISTRIBUTOR_ADDRESS,
+        address: REWARD_DISTRIBUTOR_ADDRESS,
         abi: distributorAbi,
         functionName: 'deposit',
         args: [value],

@@ -9,7 +9,7 @@ export function usePendingReward() {
   const { address } = useAccount()
 
   const { data, isLoading } = useReadContract({
-    address: CONTRACTS.DISTRIBUTOR,
+    address: CONTRACTS.REWARD_DISTRIBUTOR_ADDRESS,
     abi: distributorAbi,
     functionName: 'pendingReward',
     args: address ? [address as `0x${string}`] : undefined,

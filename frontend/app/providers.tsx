@@ -1,17 +1,16 @@
 'use client'
 
-import { WagmiProvider, createConfig, http, useChainId, useSwitchChain } from 'wagmi'
+import { WagmiProvider, http, useChainId, useSwitchChain } from 'wagmi'
 import { mainnet } from 'wagmi/chains'
 import { RainbowKitProvider, getDefaultConfig } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { wagmiConfig } from '@/lib/wagmi'
 
 const queryClient = new QueryClient()
 
-const config = getDefaultConfig({
+const wagmiConfig = getDefaultConfig({
   appName: 'Cinexit Mining',
-  projectId: 'YOUR_WALLETCONNECT_PROJECT_ID',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
   chains: [mainnet],
   transports: {
     [mainnet.id]: http(),

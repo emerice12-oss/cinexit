@@ -4,7 +4,7 @@ import { useWriteContract } from 'wagmi'
 import { useTx } from '@/lib/hooks/useTx'
 import { distributorAbi } from '@/lib/abis/distributor'
 import RequireWalletAndNetwork from '@/components/RequireWalletAndNetwork'
-import { DISTRIBUTOR_ADDRESS } from '@/lib/contracts'
+import { REWARD_DISTRIBUTOR_ADDRESS } from '@/lib/contracts'
 
 export default function ClaimCard() {
   const tx = useTx()
@@ -13,7 +13,7 @@ export default function ClaimCard() {
   async function claim(epoch: number) {
     await tx.run(() =>
       writeContractAsync({
-        address: DISTRIBUTOR_ADDRESS,
+        address: REWARD_DISTRIBUTOR_ADDRESS,
         abi: distributorAbi,
         functionName: 'claim',
         args: [epoch],
