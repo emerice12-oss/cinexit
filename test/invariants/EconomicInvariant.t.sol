@@ -4,11 +4,11 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 import "forge-std/StdInvariant.sol";
 
-import "contracts/test/mocks/MockUSDC.sol";
-import "contracts/vault/ParticipationVault.sol";
-import "contracts/core/EpochManager.sol";
-import "contracts/core/RewardDistributor.sol";
-import "contracts/core/Treasury.sol";
+import "src/contracts/test/mocks/MockUSDC.sol";
+import "src/contracts/vault/ParticipationVault.sol";
+import "src/contracts/core/EpochManager.sol";
+import "src/contracts/core/RewardDistributor.sol";
+import "src/contracts/core/Treasury.sol";
 
 /// @notice Economic invariants: conservation of USDC, fair distribution, no double claims
 contract EconomicInvariantTest is StdInvariant, Test {
@@ -53,7 +53,7 @@ contract EconomicInvariantTest is StdInvariant, Test {
         usdc.mint(alice, 100e6);
         usdc.mint(bob, 200e6);
 
-        // Target contracts for invariant fuzzing
+        // Target src/contracts for invariant fuzzing
         targetContract(address(vault));
         targetContract(address(epochManager));
         targetContract(address(distributor));

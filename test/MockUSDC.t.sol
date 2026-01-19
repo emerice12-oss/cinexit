@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
-import "../contracts/test/mocks/MockUSDC.sol";
+import "../src/contracts/test/mocks/MockUSDC.sol";
 
 contract MockUSDCTest is Test {
     MockUSDC usdc;

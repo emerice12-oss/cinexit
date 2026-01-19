@@ -3,9 +3,9 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
 
-import {ParticipationVault} from "contracts/vault/ParticipationVault.sol";
-import {EpochManager} from "contracts/core/EpochManager.sol";
-import {MockUSDC} from "contracts/test/mocks/MockUSDC.sol";
+import {ParticipationVault} from "src/contracts/vault/ParticipationVault.sol";
+import {EpochManager} from "src/contracts/core/EpochManager.sol";
+import {MockUSDC} from "src/contracts/test/mocks/MockUSDC.sol";
 
 contract SnapshotPoisoningTest is Test {
     ParticipationVault vault;

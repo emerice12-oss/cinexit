@@ -3,8 +3,8 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
 
-import {RevenueOracle} from "contracts/oracle/RevenueOracle.sol";
-import {EpochManager} from "contracts/core/EpochManager.sol";
+import {RevenueOracle} from "src/contracts/oracle/RevenueOracle.sol";
+import {EpochManager} from "src/contracts/core/EpochManager.sol";
 
 contract OracleQuorumFlipTest is Test {
     RevenueOracle oracle;

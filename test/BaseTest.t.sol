@@ -3,13 +3,13 @@ pragma solidity ^0.8.33;
 
 import "forge-std/Test.sol";
 
-import "../contracts/test/mocks/MockUSDC.sol";
-import "../contracts/governance/CircuitBreaker.sol";
-import "../contracts/vault/ParticipationVault.sol";
-import "../contracts/core/EpochManager.sol";
-import "../contracts/core/RewardDistributor.sol";
-import "../contracts/core/Treasury.sol";
-import "../contracts/oracle/RevenueOracle.sol";
+import "../src/contracts/test/mocks/MockUSDC.sol";
+import "../src/contracts/governance/CircuitBreaker.sol";
+import "../src/contracts/vault/ParticipationVault.sol";
+import "../src/contracts/core/EpochManager.sol";
+import "../src/contracts/core/RewardDistributor.sol";
+import "../src/contracts/core/Treasury.sol";
+import "../src/contracts/oracle/RevenueOracle.sol";
 
 contract BaseTest is Test {
     address internal alice = address(0x1000000000000000000000000000000000000001);

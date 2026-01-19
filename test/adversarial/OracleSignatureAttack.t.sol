@@ -3,9 +3,9 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
 
-import {RevenueOracle} from "contracts/oracle/RevenueOracle.sol";
-import {EpochManager} from "contracts/core/EpochManager.sol";
-import {MockUSDC} from "contracts/test/mocks/MockUSDC.sol";
+import {RevenueOracle} from "src/contracts/oracle/RevenueOracle.sol";
+import {EpochManager} from "src/contracts/core/EpochManager.sol";
+import {MockUSDC} from "src/contracts/test/mocks/MockUSDC.sol";
 
 contract OracleSignatureAttackTest is Test {
     RevenueOracle oracle;

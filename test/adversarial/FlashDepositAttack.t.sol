@@ -3,11 +3,11 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
 
-import {EpochManager} from "contracts/core/EpochManager.sol";
-import {ParticipationVault} from "contracts/vault/ParticipationVault.sol";
-import {RewardDistributor} from "contracts/core/RewardDistributor.sol";
-import {MockUSDC} from "contracts/test/mocks/MockUSDC.sol";
-import {CircuitBreaker} from "contracts/governance/CircuitBreaker.sol";
+import {EpochManager} from "src/contracts/core/EpochManager.sol";
+import {ParticipationVault} from "src/contracts/vault/ParticipationVault.sol";
+import {RewardDistributor} from "src/contracts/core/RewardDistributor.sol";
+import {MockUSDC} from "src/contracts/test/mocks/MockUSDC.sol";
+import {CircuitBreaker} from "src/contracts/governance/CircuitBreaker.sol";
 
 contract FlashDepositAttackTest is Test {
     EpochManager epochManager;
