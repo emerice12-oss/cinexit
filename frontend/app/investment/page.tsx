@@ -12,14 +12,14 @@ export default function InvestmentPage() {
   const { address } = useAccount()
 
   const { data: deposited } = useReadContract({
-    address: process.env.NEXT_PUBLIC_VAULT_ADDRESS as `0x${string}`,
+    address: process.env.NEXT_PUBLIC_PARTICIPATION_VAULT_ADDRESS as `0x${string}`,
     abi: VAULT_ABI,
     functionName: 'totalDeposit',
     args: address ? [address] : undefined,
   })
 
   const { data: pending } = useReadContract({
-    address: process.env.NEXT_PUBLIC_DISTRIBUTOR_ADDRESS as `0x${string}`,
+    address: process.env.NEXT_PUBLIC_REWARD_DISTRIBUTOR_ADDRESS as `0x${string}`,
     abi: distributorAbi,
     functionName: 'pendingReward',
     args: address ? [address] : undefined,
