@@ -54,6 +54,7 @@ contract ParticipationVault {
     event Withdraw(address indexed user, uint256 amount);
     event UserSnapshotted(address indexed user, uint256 indexed epochId, uint256 weight);
     event EpochFinalized(uint256 indexed epochId, uint256 totalWeight);
+    event ReferrerSet(address indexed user, address indexed referrer);
 
     /* ========== MODIFIERS ========== */
 
@@ -240,9 +241,12 @@ contract ParticipationVault {
             : EpochManager(epochManager).currentEpoch();
     }
 
-    function registerReferrer(address _referrer) external {
-        require(referrer[msg.sender] == address(0), 'Already set');
+    function setReferrer(address _referrer) external {
+        require(_referrer != address(0), 'referrer-zero');
         require(_referrer != msg.sender, 'self-referral');
+        require(referrer[msg.sender] == address(0), 'referrer already-set');
+
         referrer[msg.sender] = _referrer;
+        emit ReferrerSet(msg.sender, _referrer);
     }
 }
