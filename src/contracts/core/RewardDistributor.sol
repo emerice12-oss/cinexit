@@ -17,11 +17,7 @@ contract RewardDistributor {
     event BatchClaimed(address indexed user, uint256 totalAmount);
 
     // FIXED constructor order
-    constructor(
-        address _vault, 
-        address _treasury, 
-        address _epochManager
-    ) {
+    constructor(address _vault, address _treasury, address _epochManager) {
         vault = ParticipationVault(_vault);
         treasury = Treasury(_treasury);
         epochManager = EpochManager(_epochManager);
@@ -43,7 +39,7 @@ contract RewardDistributor {
 
         uint256 totalReward = 0;
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < length;) {
             uint256 ep = epochIds[i];
             uint256 r = _claimEpoch(epochIds[i]);
             // Do not revert on zero reward for an epoch; just skip it
@@ -55,7 +51,9 @@ contract RewardDistributor {
                 }
                 totalReward += r;
             }
-            unchecked { ++i; }
+            unchecked {
+                ++i;
+            }
         }
 
         if (totalReward == 0) return;
@@ -64,25 +62,19 @@ contract RewardDistributor {
     }
 
     /* ========== INTERNAL CLAIM LOGIC ========== */
-    function _claimEpoch(uint256 epochId)
-        internal
-        returns (uint256)
-    {
+    function _claimEpoch(uint256 epochId) internal returns (uint256) {
         // If already claimed, skip
         if (claimed[epochId][msg.sender]) return 0;
 
-        (uint256 revenue, bool finalized) =
-            epochManager.epochs(epochId);
+        (uint256 revenue, bool finalized) = epochManager.epochs(epochId);
 
         // if epoch not finalized or revenue is zero, nothing to claim
         if (!finalized || revenue == 0) return 0;
 
-        uint256 totalWeight =
-            vault.getEpochTotalWeight(epochId);
+        uint256 totalWeight = vault.getEpochTotalWeight(epochId);
         if (totalWeight == 0) return 0;
 
-        uint256 userWeight =
-            vault.getUserEpochWeight(msg.sender, epochId);
+        uint256 userWeight = vault.getUserEpochWeight(msg.sender, epochId);
         if (userWeight == 0) return 0;
 
         // If the user has withdrawn before claiming, disallow flash-reward claims
@@ -93,7 +85,6 @@ contract RewardDistributor {
         // Cap user and total weights to sane bounds to avoid pathological fuzz values
         // (not strictly necessary but improves robustness under adversarial inputs)
         // No-op in normal runs since weights come from vault and are reasonable.
-
 
         // Use full-precision mulDiv to avoid overflow on (revenue * userWeight) / totalWeight
         uint256 reward = mulDiv(revenue, userWeight, totalWeight);

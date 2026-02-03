@@ -45,11 +45,7 @@ contract RevenueOracle {
         queuedAt[action] = block.timestamp;
     }
 
-    constructor(
-        address _epochManager,
-        address[] memory _signers,
-        uint256 _quorum
-    ) {
+    constructor(address _epochManager, address[] memory _signers, uint256 _quorum) {
         owner = msg.sender;
         require(_signers.length >= _quorum, "Invalid quorum");
 
@@ -67,11 +63,7 @@ contract RevenueOracle {
 
     /* ========== CORE ORACLE LOGIC ========== */
 
-    function attestRevenue(
-        uint256 epochId,
-        uint256 revenueUSDC,
-        bytes[] calldata signatures
-    ) external {
+    function attestRevenue(uint256 epochId, uint256 revenueUSDC, bytes[] calldata signatures) external {
         // ✅ replay + ordering protection FIRST
         require(!epochUsed[epochId], "Epoch already attested");
         require(epochId == lastFinalizedEpoch + 1, "Epoch not sequential");
@@ -96,10 +88,7 @@ contract RevenueOracle {
 
     /* ========== SIGNATURE VERIFICATION ========== */
 
-    function _verifySignatures(
-        bytes32 messageHash,
-        bytes[] calldata signatures
-    ) internal view {
+    function _verifySignatures(bytes32 messageHash, bytes[] calldata signatures) internal view {
         address lastRecovered = address(0);
         uint256 validSignatures = 0;
 
@@ -138,8 +127,7 @@ contract RevenueOracle {
         return ecrecover(ethSigned, v, r, s);
     }
 
-    function _messageHash(uint256 epochId, uint256 revenueUSDC
-    ) internal view returns (bytes32) {
+    function _messageHash(uint256 epochId, uint256 revenueUSDC) internal view returns (bytes32) {
         return keccak256(abi.encodePacked(address(this), epochId, revenueUSDC, block.chainid));
     }
 
@@ -160,11 +148,7 @@ contract RevenueOracle {
     }
 
     // Admin function: timelocked owner action to add a signer
-    function adminAddSigner(address signer)
-        external
-        onlyOwner
-        timelocked(keccak256("ADD_SIGNER"))
-    {
+    function adminAddSigner(address signer) external onlyOwner timelocked(keccak256("ADD_SIGNER")) {
         require(signer != address(0), "Zero signer");
         require(!isSigner[signer], "Duplicate signer");
         isSigner[signer] = true;

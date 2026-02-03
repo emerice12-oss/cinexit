@@ -68,10 +68,7 @@ contract EpochManager {
         require(!breaker.isPaused(), "Paused");
         require(!epochs[currentEpoch].finalized, "Epoch already finalized");
 
-        epochs[currentEpoch] = Epoch({
-            rewards: rewards,
-            finalized: true
-        });
+        epochs[currentEpoch] = Epoch({rewards: rewards, finalized: true});
 
         distributor.notifyEpochFinalized(currentEpoch, rewards);
 

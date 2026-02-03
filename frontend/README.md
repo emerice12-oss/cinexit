@@ -34,3 +34,17 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## WalletConnect (RainbowKit) configuration
+
+This project uses RainbowKit / Wagmi and requires a WalletConnect Cloud project id for WalletConnect v2 in production.
+
+- Locally: add the project id to `frontend/.env.local` as:
+
+```env
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id_here
+```
+
+- Vercel: add the same env var in your Vercel project settings (Environment Variables) with key `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` and the project id value. This ensures WalletConnect initializes during server builds and runtime.
+
+If the env var is not present, the app will fall back to rendering without WalletConnect/RainbowKit providers to allow builds and static prerendering to complete.

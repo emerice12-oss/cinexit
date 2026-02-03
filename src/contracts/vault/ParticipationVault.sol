@@ -54,6 +54,7 @@ contract ParticipationVault {
     event Withdraw(address indexed user, uint256 amount);
     event UserSnapshotted(address indexed user, uint256 indexed epochId, uint256 weight);
     event EpochFinalized(uint256 indexed epochId, uint256 totalWeight);
+    event ReferrerSet(address indexed user, address indexed referrer);
 
     /* ========== MODIFIERS ========== */
 
@@ -89,8 +90,6 @@ contract ParticipationVault {
     }
 
     /* ========== CORE ACCRUAL LOGIC ========== */
-
-    
 
     function _accrue(address user) internal {
         uint256 nowTs = block.timestamp;
@@ -142,14 +141,11 @@ contract ParticipationVault {
 
     /* ============== EPOCH SNAPSHOTS ============== */
 
-    function snapshotUser(address user, uint256 epochId)
-        external
-        onlyEpochManager
-    {
+    function snapshotUser(address user, uint256 epochId) external onlyEpochManager {
         _accrue(user);
 
         uint256 weight = users[user].weightAccrued;
-        
+
         _epochUserWeight[epochId][user] = weight;
         users[user].weightAccrued = 0;
         _epochTotalWeight[epochId] += weight;
@@ -157,16 +153,13 @@ contract ParticipationVault {
         emit UserSnapshotted(user, epochId, weight);
     }
 
-    function snapshotUsers(address[] calldata userList, uint256 epochId)
-        external
-        onlyEpochManager
-    {
-        for (uint256 i = 0; i < userList.length; ) {
+    function snapshotUsers(address[] calldata userList, uint256 epochId) external onlyEpochManager {
+        for (uint256 i = 0; i < userList.length;) {
             address u = userList[i];
             _accrue(u);
 
             uint256 weight = users[u].weightAccrued;
-            
+
             _epochUserWeight[epochId][u] = weight;
             users[u].weightAccrued = 0;
             _epochTotalWeight[epochId] += weight;
@@ -181,21 +174,13 @@ contract ParticipationVault {
 
     /* ========== VIEWS (TESTS + DISTRIBUTOR) ========== */
 
-    function getUserEpochWeight(address user, uint256 epochId)
-        external
-        view
-        returns (uint256)
-    {
+    function getUserEpochWeight(address user, uint256 epochId) external view returns (uint256) {
         return _epochUserWeight[epochId][user];
     }
 
     /* ========== VIEWS ========== */
 
-    function getEpochTotalWeight(uint256 epochId)
-        external
-        view
-        returns (uint256)
-    {
+    function getEpochTotalWeight(uint256 epochId) external view returns (uint256) {
         return _epochTotalWeight[epochId];
     }
 
@@ -204,10 +189,7 @@ contract ParticipationVault {
     // track whether an epoch has been finalized in the vault
     mapping(uint256 => bool) public epochFinalized;
 
-    function finalizeEpoch(uint256 epochId)
-        external
-        onlyEpochManager
-    {
+    function finalizeEpoch(uint256 epochId) external onlyEpochManager {
         require(!epochFinalized[epochId], "Epoch already finalized");
 
         // 1️⃣ accrue global time-weighted balance
@@ -235,14 +217,15 @@ contract ParticipationVault {
     }
 
     function getCurrentEpoch() public view returns (uint256) {
-        return epochManager == address(0)
-            ? 1
-            : EpochManager(epochManager).currentEpoch();
+        return epochManager == address(0) ? 1 : EpochManager(epochManager).currentEpoch();
     }
 
-    function registerReferrer(address _referrer) external {
-        require(referrer[msg.sender] == address(0), 'Already set');
-        require(_referrer != msg.sender, 'self-referral');
+    function setReferrer(address _referrer) external {
+        require(_referrer != address(0), "referrer-zero");
+        require(_referrer != msg.sender, "self-referral");
+        require(referrer[msg.sender] == address(0), "referrer already-set");
+
         referrer[msg.sender] = _referrer;
+        emit ReferrerSet(msg.sender, _referrer);
     }
 }
