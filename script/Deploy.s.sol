@@ -4,18 +4,18 @@ pragma solidity ^0.8.20;
 import "forge-std/Script.sol";
 
 // Core
-import {Treasury} from "../src/Contracts/core/Treasury.sol";
-import {EpochManager} from "../src/Contracts/core/EpochManager.sol";
-import {RewardDistributor} from "../src/Contracts/core/RewardDistributor.sol";
+import {Treasury} from "../src/contracts/core/Treasury.sol";
+import {EpochManager} from "../src/contracts/core/EpochManager.sol";
+import {RewardDistributor} from "../src/contracts/core/RewardDistributor.sol";
 
 // Governance
-import {CircuitBreaker} from "../src/Contracts/governance/CircuitBreaker.sol";
+import {CircuitBreaker} from "../src/contracts/governance/CircuitBreaker.sol";
 
 // Vault
-import {ParticipationVault} from "../src/Contracts/vault/ParticipationVault.sol";
+import {ParticipationVault} from "../src/contracts/vault/ParticipationVault.sol";
 
 // Oracle
-import {RevenueOracle} from "../src/Contracts/oracle/RevenueOracle.sol";
+import {RevenueOracle} from "../src/contracts/oracle/RevenueOracle.sol";
 
 contract Deploy is Script {
     // ============ CONFIG ============
