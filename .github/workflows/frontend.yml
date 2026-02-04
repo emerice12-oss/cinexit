@@ -21,7 +21,7 @@ jobs:
       run: cd frontend && npm ci
     - name: Run build
       run: cd frontend && npm run build
-    - name: Run lint (if available)
-      run: cd frontend && npm run lint || echo "No lint script"
       env:
         NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.WALLETCONNECT_PROJECT_ID }}
+    - name: Run lint (if available)
+      run: cd frontend && npm run lint || echo "No lint script"
