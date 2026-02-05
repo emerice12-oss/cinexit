@@ -1,67 +1,31 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useAccount, useChainId, useContractRead, useWriteContract } from 'wagmi'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useAccount, useChainId } from 'wagmi'
+import Link from 'next/link'
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
-import { PARTICIPATION_VAULT_ADDRESS } from '@/lib/contracts'
-
-// --- Replace these with your deployed contract addresses ---
-const MOCK_USDC_ADDRESS = 
-  (process.env.NEXT_PUBLIC_MOCK_USDC_ADDRESS as `0x${string}`) ||
-  '0xYourMockUSDCAddress'  // replace with deployed MockUSDC
-
-// --- Import ABIs ---
-import { usdcAbi } from '../lib/abis/usdc'
 import { useEpochRevenues } from '@/hooks/useEpochRevenues'
-import { VAULT_ABI } from '@/lib/abis/analytics'
+import { EPOCH_MANAGER_ADDRESS } from '@/lib/contracts'
 
-// --- Contract addresses (prefer env var) ---
-const EPOCH_MANAGER_ADDRESS =
-  (process.env.NEXT_PUBLIC_EPOCH_MANAGER_ADDRESS as `0x${string}`) ||
-  '0xYourEpochManagerAddress' // replace with deployed EpochManager
-
-// --- Types ---
 interface Epoch {
   epoch: number
   usdc: number
 }
 
-// --- Dashboard Component ---
-export default function Dashboard() {
-  const { address, isConnected } = useAccount()
+export default function Home() {
+  const { isConnected } = useAccount()
   const chainId = useChainId()
   const [epochs, setEpochs] = useState<Epoch[]>([])
-  const [balance, setBalance] = useState<number>(0)
   const [loading, setLoading] = useState(false)
+  const wrongNetwork = isConnected && chainId !== 31337
 
-  // --- Network lock ---
-  const correctChainId = 1 // Hardhat local network; replace with your chain
-  const wrongNetwork = isConnected && chainId !== correctChainId
-
-  // --- Fetch USDC Balance ---
-  const { data: balanceData } = useContractRead({
-    address: MOCK_USDC_ADDRESS,
-    abi: usdcAbi,
-    functionName: 'balanceOf',
-    args: [address || '0x0000000000000000000000000000000000000000'],
-  })
+  const { data: epochRevenues, isLoading: loadingRevs } = useEpochRevenues(EPOCH_MANAGER_ADDRESS, 10)
 
   useEffect(() => {
-    if (balanceData) {
-      // USDC has 6 decimals
-      setBalance(Number(balanceData) / 1e6)
+    if (!isConnected || wrongNetwork) {
+      setEpochs([])
+      return
     }
-  }, [balanceData])
-
-  // --- Fetch Epoch Rewards (hook-based) ---
-  const { data: epochRevenues, isLoading: loadingRevs } = useEpochRevenues(
-    EPOCH_MANAGER_ADDRESS,
-    10
-  )
-
-  useEffect(() => {
-    if (!isConnected || wrongNetwork || !address) return
 
     if (loadingRevs) {
       setLoading(true)
@@ -77,96 +41,108 @@ export default function Dashboard() {
     const temp: Epoch[] = epochRevenues.map((usdc, idx) => ({ epoch: idx + 1, usdc }))
     setEpochs(temp)
     setLoading(false)
-  }, [isConnected, address, wrongNetwork, epochRevenues, loadingRevs])
-
-  const { writeContract } = useWriteContract()
-
-  // Read referral param on the client only to avoid SSR/prerender issues
-  useEffect(() => {
-    if (!isConnected) return
-    try {
-      const params = new URLSearchParams(window.location.search)
-      const ref = params.get('ref')
-      if (ref) {
-        writeContract({
-          address: PARTICIPATION_VAULT_ADDRESS as `0x${string}`,
-          abi: VAULT_ABI,
-          functionName: 'registerReferrer',
-          args: [ref],
-        })
-      }
-    } catch (err) {
-      // ignore in non-browser environments
-    }
-  }, [isConnected, writeContract])
+  }, [isConnected, wrongNetwork, epochRevenues, loadingRevs])
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-start gap-8 p-6 bg-dark-50">
-      <h1 className="text-3xl font-bold text-white">Cinexit Dashboard</h1>
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gold-50">
+      {/* Hero Section */}
+      <section className="pt-16 pb-12 px-6 text-center">
+        <h1 className="text-5xl font-bold text-blue-900 mb-4">Welcome to Cinexit</h1>
+        <p className="text-xl text-gray-600 mb-8">Your gateway to decentralized yield farming</p>
 
-      {!isConnected && (
-        <div className="p-4 bg-white text-black rounded-md">
-          Connect your wallet to view your dashboard.
-        </div>
-      )}
+        {!isConnected ? (
+          <div className="p-8 bg-white rounded-lg shadow-lg max-w-md mx-auto border-2 border-blue-200">
+            <h2 className="text-2xl font-bold text-blue-900 mb-4">Get Started</h2>
+            <p className="text-gray-600 mb-6">Connect your wallet to access all features and start earning.</p>
+            <div className="text-center">
+              <p className="text-yellow-600 font-semibold mb-2">👆 Use the Connect Wallet button in the top-right corner</p>
+            </div>
+          </div>
+        ) : wrongNetwork ? (
+          <div className="p-6 bg-red-100 text-red-700 rounded-lg max-w-md mx-auto border-2 border-red-300">
+            ⚠️ Please switch to the Hardhat local network (Chain ID: 31337)
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {/* Calculator Card */}
+            <Link href="/calculator">
+              <div className="p-6 bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
+                <h3 className="text-2xl font-bold mb-2">📊 Calculator</h3>
+                <p className="text-sm">Estimate your returns and investment performance</p>
+              </div>
+            </Link>
 
-      {/* --- Connect Wallet Button --- */}
-      {!isConnected && (
-        <div className="mb-4">
-          <ConnectButton />
-        </div>
-      )}
+            {/* Investment Card */}
+            <Link href="/investment">
+              <div className="p-6 bg-gradient-to-br from-yellow-500 to-yellow-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
+                <h3 className="text-2xl font-bold mb-2">💰 Investment</h3>
+                <p className="text-sm">View your investment status and current rewards</p>
+              </div>
+            </Link>
 
-      {/* --- Network Warning --- */}
-      {wrongNetwork && (
-        <div className="p-4 bg-red-100 text-red-700 rounded-md">
-          ⚠️ Please switch to the correct network to view your rewards.
-        </div>
-      )}
+            {/* Referral Card */}
+            <Link href="/referral">
+              <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
+                <h3 className="text-2xl font-bold mb-2">🤝 Referral</h3>
+                <p className="text-sm">Earn rewards by referring friends and partners</p>
+              </div>
+            </Link>
+          </div>
+        )}
+      </section>
 
-      {/* --- Wallet Info --- */}
+      {/* Epoch Rewards Section */}
       {isConnected && !wrongNetwork && (
-        <div className="p-6 bg-white rounded-xl shadow-md w-full max-w-md">
-          <h2 className="text-xl font-semibold">Wallet</h2>
-          <p className="mt-2 text-gray-700 break-all">{address}</p>
-          <p className="mt-2 font-semibold text-lg">USDC Balance: {balance.toFixed(2)} USDC</p>
-          <p className="mt-1 text-sm text-gray-500">Estimated daily income: ${(balance * 0.027).toFixed(2)}</p>
-        </div>
+        <section className="py-12 px-6 max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-blue-900 mb-8 text-center">📈 Recent Epoch Rewards</h2>
+
+          {loading ? (
+            <div className="text-center text-gray-600">Loading epoch data...</div>
+          ) : epochs.length > 0 ? (
+            <>
+              {/* Chart */}
+              <div className="bg-white p-8 rounded-lg shadow-lg mb-8">
+                <ResponsiveContainer width="100%" height={350}>
+                  <LineChart data={epochs}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                    <XAxis dataKey="epoch" stroke="#666" />
+                    <YAxis stroke="#666" />
+                    <Tooltip contentStyle={{ backgroundColor: '#f0f0f0', border: '1px solid #ccc' }} />
+                    <Line type="monotone" dataKey="usdc" stroke="#2563eb" strokeWidth={3} dot={{ fill: '#fbbf24' }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Table */}
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-blue-600 text-white">
+                    <tr>
+                      <th className="px-6 py-3 text-left font-semibold">Epoch</th>
+                      <th className="px-6 py-3 text-right font-semibold">Rewards (USDC)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {epochs.map((e) => (
+                      <tr key={e.epoch} className="hover:bg-blue-50 transition">
+                        <td className="px-6 py-4 font-semibold text-gray-900">#{e.epoch}</td>
+                        <td className="px-6 py-4 text-right text-yellow-600 font-bold">${e.usdc.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className="text-center text-gray-600">No epoch data available yet.</div>
+          )}
+        </section>
       )}
 
-      {/* --- Loading Indicator --- */}
-      {loading && <div className="p-4 bg-gray-100 text-gray-700 rounded-md">Fetching rewards...</div>}
-
-      {/* --- Rewards Chart --- */}
-      {epochs.length > 0 && (
-        <div className="w-full max-w-3xl h-80 bg-white p-4 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-2">Epoch Rewards</h2>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={epochs}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="epoch" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="usdc" stroke="#4ade80" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-
-      {/* --- Epoch List --- */}
-      {epochs.length > 0 && (
-        <div className="w-full max-w-3xl p-4 bg-white rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-2">Recent Epochs</h2>
-          <ul className="divide-y divide-gray-200">
-            {epochs.map((e) => (
-              <li key={e.epoch} className="py-2 flex justify-between">
-                <span>Epoch {e.epoch}</span>
-                <span>{e.usdc.toFixed(2)} USDC</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* Footer */}
+      <footer className="mt-16 py-8 px-6 text-center text-gray-600 border-t">
+        <p>&copy; 2026 Cinexit. All rights reserved.</p>
+      </footer>
     </main>
   )
 }

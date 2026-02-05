@@ -3,24 +3,58 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary-blue: #2563eb;
+  --dark-blue: #1e40af;
+  --light-blue: #dbeafe;
+  --primary-gold: #fbbf24;
+  --dark-gold: #d97706;
+  --light-gold: #fef3c7;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary-blue);
+  --color-accent: var(--primary-gold);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a;
+    --foreground: #f1f5f9;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/* Blue and Gold Accent */
+.btn-primary {
+  @apply px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition;
+}
+
+.btn-secondary {
+  @apply px-6 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg transition;
+}
+
+.card-blue {
+  @apply bg-gradient-to-br from-blue-500 to-blue-700 text-white;
+}
+
+.card-gold {
+  @apply bg-gradient-to-br from-yellow-500 to-yellow-700 text-white;
+}
+
+.text-primary {
+  @apply text-blue-900;
+}
+
+.text-accent {
+  @apply text-yellow-600;
 }
