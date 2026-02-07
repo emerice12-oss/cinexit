@@ -17,7 +17,7 @@ export default function Home() {
   const chainId = useChainId()
   const [epochs, setEpochs] = useState<Epoch[]>([])
   const [loading, setLoading] = useState(false)
-  const wrongNetwork = isConnected && chainId !== 31337
+  const wrongNetwork = isConnected && chainId !== 1
 
   const { data: epochRevenues, isLoading: loadingRevs } = useEpochRevenues(EPOCH_MANAGER_ADDRESS, 10)
 
@@ -60,7 +60,7 @@ export default function Home() {
           </div>
         ) : wrongNetwork ? (
           <div className="p-6 bg-red-100 text-red-700 rounded-lg max-w-md mx-auto border-2 border-red-300">
-            ⚠️ Please switch to the Hardhat local network (Chain ID: 31337)
+            ⚠️ Please switch to the Mainnet (Chain ID: 1)
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
