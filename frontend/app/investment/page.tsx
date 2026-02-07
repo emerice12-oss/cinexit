@@ -9,7 +9,7 @@ export default function InvestmentPage() {
   const chainId = useChainId()
   const { isActive, isPaused, depositAmount, pendingReward } = useInvestmentStatus()
   const { epoch = 0n } = useCurrentEpoch()
-  const wrongNetwork = isConnected && chainId !== 31337
+  const wrongNetwork = isConnected && chainId !== 1
 
   const dailyIncome = depositAmount * 0.027 / 365
 
@@ -29,7 +29,7 @@ export default function InvestmentPage() {
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-6">
         <div className="p-8 bg-red-100 rounded-lg shadow-lg max-w-md border-2 border-red-300 text-center">
           <h2 className="text-2xl font-bold text-red-900 mb-4">Wrong Network</h2>
-          <p className="text-red-700">Please switch to Hardhat local network (Chain ID: 31337).</p>
+          <p className="text-red-700">Please switch to Ethereum Mainnet (Chain ID: 1).</p>
         </div>
       </main>
     )
