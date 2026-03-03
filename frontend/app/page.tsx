@@ -6,6 +6,9 @@ import Link from 'next/link'
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
 import { useEpochRevenues } from '@/hooks/useEpochRevenues'
 import { EPOCH_MANAGER_ADDRESS } from '@/lib/contracts'
+import WalletConnect from '@/components/WalletConnect'
+import DepositCard from '@/components/DepositCard'
+import InvestmentCard from '@/components/InvestmentCard'
 
 interface Epoch {
   epoch: number
@@ -48,46 +51,51 @@ export default function Home() {
       {/* Hero Section */}
       <section className="pt-16 pb-12 px-6 text-center">
         <h1 className="text-5xl font-bold text-blue-900 mb-4">Welcome to Cinexit</h1>
-        <p className="text-xl text-gray-600 mb-8">Your gateway to decentralized yield farming</p>
+        <p className="text-xl text-gray-600 mb-8">Earn 27% APY on Ethereum USDC with 5-Day Investment Cycles</p>
 
         {!isConnected ? (
-          <div className="p-8 bg-white rounded-lg shadow-lg max-w-md mx-auto border-2 border-blue-200">
-            <h2 className="text-2xl font-bold text-blue-900 mb-4">Get Started</h2>
-            <p className="text-gray-600 mb-6">Connect your wallet to access all features and start earning.</p>
-            <div className="text-center">
-              <p className="text-yellow-600 font-semibold mb-2">👆 Use the Connect Wallet button in the top-right corner</p>
-            </div>
+          <div className="max-w-2xl mx-auto mb-12">
+            <WalletConnect />
           </div>
         ) : wrongNetwork ? (
           <div className="p-6 bg-red-100 text-red-700 rounded-lg max-w-md mx-auto border-2 border-red-300">
             ⚠️ Please switch to the Ethereum Mainnet (Chain ID: 1)
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {/* Calculator Card */}
-            <Link href="/calculator">
-              <div className="p-6 bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
-                <h3 className="text-2xl font-bold mb-2">📊 Calculator</h3>
-                <p className="text-sm">Estimate your returns and investment performance</p>
-              </div>
-            </Link>
+          <>
+            {/* Deposit and Investment Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
+              <DepositCard />
+              <InvestmentCard />
+            </div>
 
-            {/* Investment Card */}
-            <Link href="/investment">
-              <div className="p-6 bg-gradient-to-br from-yellow-500 to-yellow-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
-                <h3 className="text-2xl font-bold mb-2">💰 Investment</h3>
-                <p className="text-sm">View your investment status and current rewards</p>
-              </div>
-            </Link>
+            {/* Navigation Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {/* Calculator Card */}
+              <Link href="/calculator">
+                <div className="p-6 bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
+                  <h3 className="text-2xl font-bold mb-2">📊 Calculator</h3>
+                  <p className="text-sm">Estimate your returns and investment performance</p>
+                </div>
+              </Link>
 
-            {/* Referral Card */}
-            <Link href="/referral">
-              <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
-                <h3 className="text-2xl font-bold mb-2">🤝 Referral</h3>
-                <p className="text-sm">Earn rewards by referring friends and partners</p>
-              </div>
-            </Link>
-          </div>
+              {/* Dashboard Card */}
+              <Link href="/dashboard">
+                <div className="p-6 bg-gradient-to-br from-indigo-500 to-indigo-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
+                  <h3 className="text-2xl font-bold mb-2">📈 Dashboard</h3>
+                  <p className="text-sm">Track your performance and analytics</p>
+                </div>
+              </Link>
+
+              {/* Referral Card */}
+              <Link href="/referral">
+                <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
+                  <h3 className="text-2xl font-bold mb-2">🤝 Referral</h3>
+                  <p className="text-sm">Earn rewards by referring friends and partners</p>
+                </div>
+              </Link>
+            </div>
+          </>
         )}
       </section>
 
