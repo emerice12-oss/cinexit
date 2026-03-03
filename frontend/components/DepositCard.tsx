@@ -9,6 +9,37 @@ import RequireWalletAndNetwork from './RequireWalletAndNetwork'
 import { REWARD_DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/contracts'
 import { epochAbi } from '@/lib/abis/epoch'
 
+// minimal ERC20 ABI for approve/balanceOf/allowance
+const ERC20_ABI = [
+  {
+    name: 'approve',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [{ name: '', type: 'bool' }],
+  },
+  {
+    name: 'balanceOf',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  {
+    name: 'allowance',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+    ],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+] as const
+
 const USDC_DECIMALS = 6
 const DEPOSIT_CYCLE_DAYS = 5
 const DEPOSIT_CYCLE_MS = DEPOSIT_CYCLE_DAYS * 24 * 60 * 60 * 1000
@@ -25,15 +56,7 @@ export default function DepositCard() {
   // Read USDC balance
   const { data: usdcBalance } = useReadContract({
     address: USDC_ADDRESS,
-    abi: [
-      {
-        name: 'balanceOf',
-        type: 'function',
-        stateMutability: 'view',
-        inputs: [{ name: 'account', type: 'address' }],
-        outputs: [{ name: '', type: 'uint256' }],
-      },
-    ] as const,
+    abi: ERC20_ABI,
     functionName: 'balanceOf',
     args: address ? [address] : undefined,
   })
@@ -95,7 +118,7 @@ export default function DepositCard() {
       // Approve USDC
       await writeContractAsync({
         address: USDC_ADDRESS,
-        abi: epochAbi,
+        abi: ERC20_ABI,
         functionName: 'approve',
         args: [REWARD_DISTRIBUTOR_ADDRESS, value],
       })
