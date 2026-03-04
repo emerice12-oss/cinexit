@@ -1,4 +1,4 @@
-export const USDC_ADDRESS = '0xA0b86991C6218b36c1d19D4a2e9Eb0cE3606eB48' as `0x${string}`
+export const USDC_ADDRESS = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' as `0x${string}`
 // Sepolia testnet USDC mock for testing (if mainnet causes issues)
 export const USDC_SEPOLIA_ADDRESS = '0x6f14C02fc1F78322cFd7d707aB90f6dA3315cB3d' as `0x${string}`
 export const REWARD_DISTRIBUTOR_ADDRESS = '0xBFeabaa0253C197F5fB08D0CFa060A0E5B318b39' as `0x${string}`

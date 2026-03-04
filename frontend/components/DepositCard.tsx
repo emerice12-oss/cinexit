@@ -8,11 +8,15 @@ import { distributorAbi } from '@/lib/abis/distributor'
 import { REWARD_DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/contracts'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 
-// Validate and normalize USDC address
-const validatedUSDCAddress = isAddress(USDC_ADDRESS) ? USDC_ADDRESS : undefined
+// some versions of viem's isAddress reject the checksummed address, so
+// normalize to lowercase before validation. the contract itself is not
+// case-sensitive.
+const lowercaseUSDC = USDC_ADDRESS.toLowerCase()
+console.debug('USDC_ADDRESS normalized to', lowercaseUSDC)
+const validatedUSDCAddress = isAddress(lowercaseUSDC) ? lowercaseUSDC : undefined
 
 if (!validatedUSDCAddress) {
-  console.warn(`Invalid USDC_ADDRESS: ${USDC_ADDRESS}. Deposit functionality may not work.`)
+  console.warn(`Invalid USDC_ADDRESS after normalization: ${USDC_ADDRESS}. Deposit may fail.`)
 }
 
 // minimal ERC20 ABI for approve/balanceOf/allowance
