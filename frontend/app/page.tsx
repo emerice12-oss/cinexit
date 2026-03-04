@@ -51,7 +51,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="pt-16 pb-12 px-6 text-center">
         <h1 className="text-5xl font-bold text-blue-900 mb-4">Welcome to Cinexit</h1>
-        <p className="text-xl text-gray-600 mb-8">Earn 27% APY on Ethereum USDC with 5-Day Investment Cycles</p>
+        <p className="text-xl text-gray-600 mb-8">Earn 27% APY on Ethereum USDC — Just Connect & Invest</p>
 
         {!isConnected ? (
           <div className="max-w-2xl mx-auto mb-12">
@@ -63,14 +63,26 @@ export default function Home() {
           </div>
         ) : (
           <>
-            {/* Deposit and Investment Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
-              <DepositCard />
+            {/* Main Investment Card (now primary) */}
+            <div className="max-w-3xl mx-auto mb-12">
               <InvestmentCard />
+            </div>
+
+            {/* Secondary: Optional Deposit Section */}
+            <div className="max-w-2xl mx-auto mb-12">
+              <DepositCard />
             </div>
 
             {/* Navigation Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {/* Running Investments Card */}
+              <Link href="/investment/running">
+                <div className="p-6 bg-gradient-to-br from-green-500 to-emerald-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
+                  <h3 className="text-2xl font-bold mb-2">💰 My Investments</h3>
+                  <p className="text-sm">View and manage your running investments</p>
+                </div>
+              </Link>
+
               {/* Calculator Card */}
               <Link href="/calculator">
                 <div className="p-6 bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition cursor-pointer">
@@ -148,7 +160,7 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      <footer className="mt-16 py-8 px-6 text-center text-gray-600 border-t">
+      <footer className="mt-16 py-8 px-6 text-center text-white border-t">
         <p>&copy; 2026 Cinexit. All rights reserved.</p>
       </footer>
     </main>
