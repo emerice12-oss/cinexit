@@ -9,7 +9,7 @@ const DEPOSIT_CYCLE_DAYS = 5
 const DEPOSIT_CYCLE_MS = DEPOSIT_CYCLE_DAYS * 24 * 60 * 60 * 1000
 
 export default function InvestmentCard() {
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const { depositAmount, pendingReward, isActive } = useInvestmentStatus()
   const [lastDepositTime, setLastDepositTime] = useState<number>(0)
   const [nextDepositTime, setNextDepositTime] = useState<string>('')
@@ -19,6 +19,12 @@ export default function InvestmentCard() {
 
   useEffect(() => {
     const checkCycleStatus = () => {
+      if (!isConnected) {
+        setNextDepositTime('Connect wallet to view deposit status')
+        setCycleProgress(0)
+        return
+      }
+
       const stored = localStorage.getItem(`lastDeposit_${address}`)
       if (stored) {
         const lastTime = parseInt(stored, 10)
@@ -51,11 +57,11 @@ export default function InvestmentCard() {
     const interval = setInterval(checkCycleStatus, 1000) // Update every second
 
     return () => clearInterval(interval)
-  }, [address])
+  }, [isConnected, address])
 
   // Connected-investment cycle tracking (separate from deposit-based)
   useEffect(() => {
-    if (!address) {
+    if (!isConnected) {
       setConnectedSince(null)
       setConnectedProgress(0)
       return
@@ -80,7 +86,7 @@ export default function InvestmentCard() {
     check()
     const iv = setInterval(check, 1000)
     return () => clearInterval(iv)
-  }, [address])
+  }, [isConnected, address])
 
   const dailyIncome = depositAmount * 0.27 / 365
   const monthlyIncome = dailyIncome * 30
@@ -98,7 +104,7 @@ export default function InvestmentCard() {
   }
 
   function toggleConnectedInvestment() {
-    if (!address) return
+    if (!isConnected) return
     const key = `connectedInvestment_${address}`
     if (connectedSince) {
       // stop
@@ -137,13 +143,16 @@ export default function InvestmentCard() {
           
           <button
             onClick={toggleConnectedInvestment}
+            disabled={!isConnected}
             className={`px-6 py-3 rounded-lg font-bold text-sm transition-all ${
-              connectedSince 
-                ? 'bg-red-600 hover:bg-red-700 text-white' 
-                : 'bg-white hover:bg-gray-100 text-emerald-700'
+              !isConnected
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : connectedSince 
+                ? 'bg-red-600 hover:bg-red-700 text-white cursor-pointer' 
+                : 'bg-white hover:bg-gray-100 text-emerald-700 cursor-pointer'
             }`}
           >
-            {connectedSince ? '⏹ Withdraw' : '▶ Invest'}
+            {!isConnected ? 'Connect Wallet First' : connectedSince ? '⏹ Withdraw' : '▶ Invest'}
           </button>
         </div>
 
