@@ -52,16 +52,11 @@ const ERC20_ABI = [
 ] as const
 
 const USDC_DECIMALS = 6
-const DEPOSIT_CYCLE_DAYS = 5
-const DEPOSIT_CYCLE_MS = DEPOSIT_CYCLE_DAYS * 24 * 60 * 60 * 1000
 
 export default function DepositCard() {
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const [amount, setAmount] = useState('')
-  const [lastDepositTime, setLastDepositTime] = useState<number>(0)
-  const [canDeposit, setCanDeposit] = useState(true)
-  const [timeUntilNext, setTimeUntilNext] = useState<string>('')
   const tx = useTx()
   const { writeContractAsync } = useWriteContract()
   const { error: toastError } = useToast()
@@ -75,40 +70,6 @@ export default function DepositCard() {
     args: address && validatedUSDCAddress ? [address] : undefined,
   })
 
-  // Check deposit eligibility based on 5-day cycle
-  useEffect(() => {
-    const checkDepositEligibility = () => {
-      const stored = localStorage.getItem(`lastDeposit_${address}`)
-      if (stored) {
-        const lastTime = parseInt(stored, 10)
-        setLastDepositTime(lastTime)
-        const now = Date.now()
-        const elapsed = now - lastTime
-        const isEligible = elapsed >= DEPOSIT_CYCLE_MS
-
-        if (!isEligible) {
-          setCanDeposit(false)
-          const remaining = DEPOSIT_CYCLE_MS - elapsed
-          const days = Math.floor(remaining / (24 * 60 * 60 * 1000))
-          const hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000))
-          const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000))
-          setTimeUntilNext(`${days}d ${hours}h ${minutes}m`)
-        } else {
-          setCanDeposit(true)
-          setTimeUntilNext('')
-        }
-      } else {
-        setCanDeposit(true)
-        setTimeUntilNext('')
-      }
-    }
-
-    checkDepositEligibility()
-    const interval = setInterval(checkDepositEligibility, 60000) // Update every minute
-
-    return () => clearInterval(interval)
-  }, [address])
-
   const formattedBalance = usdcBalance
     ? parseFloat(formatUnits(usdcBalance as bigint, USDC_DECIMALS)).toFixed(2)
     : '0.00'
@@ -121,15 +82,9 @@ export default function DepositCard() {
       toastError('Invalid Amount', 'Please enter an amount to deposit')
       return
     }
-
     const parsedAmount = parseFloat(depositAmount)
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       toastError('Invalid Amount', 'Please enter a valid positive amount')
-      return
-    }
-
-    if (!canDeposit) {
-      toastError('Deposit Cooldown Active', `Next deposit available in ${timeUntilNext}`)
       return
     }
 
@@ -167,10 +122,8 @@ export default function DepositCard() {
       })
     })
 
-    // Record deposit time on success
+    // Clear input on success (blockchain tracks state)
     if (tx.state === 'success') {
-      localStorage.setItem(`lastDeposit_${address}`, Date.now().toString())
-      setCanDeposit(false)
       setAmount('')
     }
   }
@@ -210,19 +163,6 @@ export default function DepositCard() {
             <p className="text-3xl font-bold text-yellow-600">${formattedBalance}</p>
           </div>
 
-          {/* Cycle Status */}
-          {!canDeposit && (
-            <div className="bg-orange-100 border-l-4 border-orange-500 p-4 rounded">
-              <p className="text-orange-900 font-semibold">⏳ 5-Day Investment Cycle</p>
-              <p className="text-orange-800 text-sm mt-1">
-                Next deposit available in: <span className="font-bold">{timeUntilNext}</span>
-              </p>
-              <p className="text-orange-700 text-xs mt-2">
-                Your last investment is locked for 5 days to maximize returns.
-              </p>
-            </div>
-          )}
-
           {/* Amount Input */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
@@ -233,7 +173,7 @@ export default function DepositCard() {
               placeholder="Enter amount"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              disabled={!canDeposit || tx.isBusy}
+              disabled={tx.isBusy}
               className="w-full px-4 py-2 border-2 border-yellow-300 text-gray-400 rounded-lg focus:outline-none focus:border-yellow-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
           </div>
@@ -244,7 +184,7 @@ export default function DepositCard() {
               <button
                 key={preset}
                 onClick={() => setAmount(preset.toString())}
-                disabled={!canDeposit || tx.isBusy}
+                disabled={tx.isBusy}
                 className="px-3 py-2 bg-yellow-200 hover:bg-yellow-300 text-yellow-900 font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 ${preset}
@@ -254,10 +194,10 @@ export default function DepositCard() {
 
           {/* Deposit Button */}
           <button
-            disabled={!canDeposit || tx.isBusy || !amount}
+            disabled={tx.isBusy || !amount}
             onClick={() => handleDeposit(amount)}
             className={`w-full py-3 font-bold text-white rounded-lg transition ${
-              !canDeposit || tx.isBusy || !amount
+              tx.isBusy || !amount
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-yellow-600 hover:bg-yellow-700 active:scale-95'
             }`}
@@ -265,8 +205,7 @@ export default function DepositCard() {
             {tx.state === 'signing' && '✍️ Confirm in your wallet'}
             {tx.state === 'pending' && '⏳ Depositing USDC...'}
             {tx.state === 'success' && '✅ Deposit Successful!'}
-            {tx.state === 'idle' && !canDeposit && '🔒 Locked (5-Day Cycle)'}
-            {tx.state === 'idle' && canDeposit && `Deposit ${amount || '0'} USDC`}
+            {tx.state === 'idle' && `Deposit ${amount || '0'} USDC`}
             {tx.state === 'error' && '❌ Try Again'}
           </button>
 
