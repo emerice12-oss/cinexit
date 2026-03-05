@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { waitForTransactionReceipt } from '@wagmi/core'
 import { useConfig } from 'wagmi'
+import { toastManager } from '@/lib/utils/toast'
 
 export type TxState =
   | 'idle'
@@ -20,20 +21,26 @@ export function useTx() {
     try {
       setError(null)
       setState('signing')
+      toastManager.info('Awaiting Confirmation', 'Please confirm the transaction in your wallet')
 
       const hash = await writeFn()
 
       setState('pending')
+      toastManager.info('Transaction Pending', 'Your transaction is being processed on the blockchain')
+
       await waitForTransactionReceipt(config, { hash })
 
       setState('success')
+      toastManager.success('Transaction Confirmed', 'Your transaction has been successfully confirmed')
 
       // auto-reset after success
       setTimeout(() => setState('idle'), 2000)
     } catch (err: any) {
       console.error(err)
-      setError(err?.shortMessage || err?.message || 'Transaction failed')
+      const errorMsg = err?.shortMessage || err?.message || 'Transaction failed'
+      setError(errorMsg)
       setState('error')
+      toastManager.error('Transaction Failed', errorMsg)
     }
   }
 

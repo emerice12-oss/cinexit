@@ -3,7 +3,7 @@
 import { useAccount, useReadContract } from 'wagmi'
 import { formatUnits } from 'viem'
 import { CONTRACTS } from '@/lib/contracts'
-import { VAULT_ABI } from '@/lib/abis/analytics'
+import { participationVaultAbi } from '@/lib/abis/vault'
 import { distributorAbi } from '@/lib/abis/distributor'
 import { CIRCUIT_BREAKER_ABI } from '@/lib/abis/analytics'
 
@@ -12,8 +12,8 @@ export function useInvestmentStatus() {
 
   const { data: deposited } = useReadContract({
     address: CONTRACTS.PARTICIPATION_VAULT_ADDRESS,
-    abi: VAULT_ABI,
-    functionName: 'balanceOf',
+    abi: participationVaultAbi,
+    functionName: 'getUserDeposit',
     args: address ? [address as `0x${string}`] : undefined,
   })
 

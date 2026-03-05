@@ -6,6 +6,8 @@ import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { getWagmiConfig } from '@/lib/wagmi'
+import { ToastProvider } from '@/lib/context/toast-context'
+import { ToastDisplay } from '@/components/ToastDisplay'
 
 const queryClient = new QueryClient()
 
@@ -50,7 +52,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-          <NetworkGuard>{children}</NetworkGuard>
+          <ToastProvider>
+            <NetworkGuard>{children}</NetworkGuard>
+            <ToastDisplay />
+          </ToastProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

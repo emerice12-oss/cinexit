@@ -11,6 +11,7 @@ contract ParticipationVault {
     CircuitBreaker public breaker;
 
     address public epochManager;
+    address public owner;
 
     /* ========== DATA STRUCTURES ========== */
 
@@ -63,6 +64,11 @@ contract ParticipationVault {
         _;
     }
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
     modifier whenNotPaused() {
         if (address(breaker) != address(0)) {
             require(!breaker.isPaused(), "Deposits Paused");
@@ -73,20 +79,29 @@ contract ParticipationVault {
     /* ========== CONSTRUCTOR ========== */
 
     constructor(address _usdc) {
+        require(_usdc != address(0), "Invalid USDC address");
         USDC = IERC20(_usdc);
+        owner = msg.sender;
         epochStart = block.timestamp;
         lastGlobalUpdate = block.timestamp;
     }
 
     /* ========== ADMIN SETUP ========== */
 
-    function setEpochManager(address _epochManager) external {
+    function setEpochManager(address _epochManager) external onlyOwner {
+        require(_epochManager != address(0), "Invalid epoch manager address");
         require(epochManager == address(0), "Epoch manager already set");
         epochManager = _epochManager;
     }
 
-    function setBreaker(address _breaker) external {
+    function setBreaker(address _breaker) external onlyOwner {
+        require(_breaker != address(0), "Invalid breaker address");
         breaker = CircuitBreaker(_breaker);
+    }
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "Invalid new owner address");
+        owner = newOwner;
     }
 
     /* ========== CORE ACCRUAL LOGIC ========== */

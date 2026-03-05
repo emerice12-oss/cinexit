@@ -2,7 +2,7 @@
 
 import { useReadContract, useAccount } from 'wagmi'
 import { formatUnits } from 'viem'
-import { VAULT_ABI } from '@/lib/abis/analytics'
+import { participationVaultAbi } from '@/lib/abis/vault'
 import { CONTRACTS } from '@/lib/contracts'
 
 export function useReferralStats() {
@@ -10,14 +10,14 @@ export function useReferralStats() {
 
   const { data: referrer } = useReadContract({
     address: CONTRACTS.PARTICIPATION_VAULT_ADDRESS,
-    abi: VAULT_ABI,
-    functionName: 'referrerOf',
+    abi: participationVaultAbi,
+    functionName: 'referrer',
     args: address ? [address] : undefined,
   })
 
   const { data: volume } = useReadContract({
     address: CONTRACTS.PARTICIPATION_VAULT_ADDRESS,
-    abi: VAULT_ABI,
+    abi: participationVaultAbi,
     functionName: 'referralVolume',
     args: address ? [address] : undefined,
   })

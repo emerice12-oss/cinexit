@@ -29,7 +29,7 @@ export default function Dashboard() {
       <main className="p-6 space-y-6">
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
 
-        <div className="p-4 bg-white rounded shadow">
+        <div className="p-4 bg-white rounded shadow text-gray-300">
           <p>USDC Balance: <strong>{balanceFormatted}</strong></p>
           <p>Pending Rewards: {pendingFormatted}</p>
           <p>Current Epoch: {epoch.toString()}</p>
@@ -37,7 +37,7 @@ export default function Dashboard() {
         </div>
 
        
-        <div className="p-4 bg-white rounded shadow">
+        <div className="p-4 bg-white rounded shadow text-gray-300">
           {/* Real balance, rewards, charts */}
         </div>
       </main>

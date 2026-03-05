@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react'
 import { parseUnits, formatUnits, isAddress } from 'viem'
 import { useWriteContract, useReadContract, useAccount, useChainId } from 'wagmi'
 import { useTx } from '@/lib/hooks/useTx'
-import { distributorAbi } from '@/lib/abis/distributor'
-import { REWARD_DISTRIBUTOR_ADDRESS, USDC_ADDRESS } from '@/lib/contracts'
+import { participationVaultAbi } from '@/lib/abis/vault'
+import { PARTICIPATION_VAULT_ADDRESS, USDC_ADDRESS } from '@/lib/contracts'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useToast } from '@/lib/context/toast-context'
 
 // some versions of viem's isAddress reject the checksummed address, so
 // normalize to lowercase before validation. the contract itself is not
@@ -63,6 +64,7 @@ export default function DepositCard() {
   const [timeUntilNext, setTimeUntilNext] = useState<string>('')
   const tx = useTx()
   const { writeContractAsync } = useWriteContract()
+  const { error: toastError } = useToast()
   const wrongNetwork = isConnected && chainId !== 1
 
   // Read USDC balance - with error handling for invalid addresses
@@ -114,13 +116,30 @@ export default function DepositCard() {
   const presetAmounts = [100, 500, 1000, 5000]
 
   async function handleDeposit(depositAmount: string) {
-    if (!depositAmount || parseFloat(depositAmount) <= 0) {
-      alert('Please enter a valid amount')
+    // Validate input amount
+    if (!depositAmount || depositAmount.trim() === '') {
+      toastError('Invalid Amount', 'Please enter an amount to deposit')
+      return
+    }
+
+    const parsedAmount = parseFloat(depositAmount)
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      toastError('Invalid Amount', 'Please enter a valid positive amount')
       return
     }
 
     if (!canDeposit) {
-      alert(`Cannot deposit yet. Next deposit available in ${timeUntilNext}`)
+      toastError('Deposit Cooldown Active', `Next deposit available in ${timeUntilNext}`)
+      return
+    }
+
+    if (!address) {
+      toastError('Wallet Not Connected', 'Please connect your wallet to deposit')
+      return
+    }
+
+    if (wrongNetwork) {
+      toastError('Wrong Network', 'Please switch to Ethereum Mainnet')
       return
     }
 
@@ -128,7 +147,7 @@ export default function DepositCard() {
 
     await tx.run(async () => {
       if (!validatedUSDCAddress) {
-        throw new Error('USDC address is invalid. Cannot proceed with deposit.')
+        throw new Error('Invalid USDC contract address. Cannot proceed with deposit.')
       }
       
       // Approve USDC
@@ -136,13 +155,13 @@ export default function DepositCard() {
         address: validatedUSDCAddress,
         abi: ERC20_ABI,
         functionName: 'approve',
-        args: [REWARD_DISTRIBUTOR_ADDRESS, value],
+        args: [PARTICIPATION_VAULT_ADDRESS, value],
       })
 
       // Deposit USDC
       return writeContractAsync({
-        address: REWARD_DISTRIBUTOR_ADDRESS,
-        abi: distributorAbi,
+        address: PARTICIPATION_VAULT_ADDRESS,
+        abi: participationVaultAbi,
         functionName: 'deposit',
         args: [value],
       })
@@ -215,7 +234,7 @@ export default function DepositCard() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               disabled={!canDeposit || tx.isBusy}
-              className="w-full px-4 py-2 border-2 border-yellow-300 rounded-lg focus:outline-none focus:border-yellow-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full px-4 py-2 border-2 border-yellow-300 text-gray-400 rounded-lg focus:outline-none focus:border-yellow-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
           </div>
 

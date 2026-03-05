@@ -41,7 +41,7 @@ export default function CalculatorPage() {
                 value={depositAmount}
                 onChange={(e) => setDepositAmount(parseFloat(e.target.value) || 0)}
                 min="0"
-                className="w-full px-4 py-2 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-600"
+                className="w-full px-4 py-2 border-2 border-blue-300 text-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
               />
               <p className="text-sm text-gray-600 mt-2">${depositAmount.toLocaleString()}</p>
             </div>
@@ -55,7 +55,7 @@ export default function CalculatorPage() {
                 onChange={(e) => setApy(parseFloat(e.target.value) || 0)}
                 min="0"
                 step="0.1"
-                className="w-full px-4 py-2 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-600"
+                className="w-full px-4 py-2 border-2 border-blue-300 text-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
               />
               <p className="text-sm text-gray-600 mt-2">{apy}% APY</p>
             </div>
@@ -69,7 +69,7 @@ export default function CalculatorPage() {
                 onChange={(e) => setMonths(parseFloat(e.target.value) || 0)}
                 min="1"
                 max="120"
-                className="w-full px-4 py-2 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-600"
+                className="w-full px-4 py-2 border-2 border-blue-300 text-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
               />
               <p className="text-sm text-gray-600 mt-2">{months} months</p>
             </div>
